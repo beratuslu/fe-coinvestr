@@ -109,11 +109,11 @@
         </button>
         <!--end::Submit button-->
 
-        <!--begin::Separator-->
-        <div class="text-center text-muted text-uppercase fw-bolder mb-5">
+        <!-- begin::Separator-->
+        <!-- <div class="text-center text-muted text-uppercase fw-bolder mb-5">
           or
-        </div>
-        <!--end::Separator-->
+        </div> -->
+        <!--end::Separator -->
 
         <!--begin::Google link-->
         <a
