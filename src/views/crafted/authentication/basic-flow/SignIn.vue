@@ -11,7 +11,7 @@
       <!--begin::Heading-->
       <div class="text-center mb-10">
         <!--begin::Title-->
-        <h1 class="text-dark mb-3">Sign In to Metronic</h1>
+        <h1 class="text-dark mb-3">Sign In</h1>
         <!--end::Title-->
 
         <!--begin::Link-->
@@ -26,12 +26,12 @@
       </div>
       <!--begin::Heading-->
 
-      <div class="mb-10 bg-light-info p-8 rounded">
+      <!-- <div class="mb-10 bg-light-info p-8 rounded">
         <div class="text-info">
           Use account <strong>admin@demo.com</strong> and password
           <strong>demo</strong> to continue.
         </div>
-      </div>
+      </div> -->
 
       <!--begin::Input group-->
       <div class="fv-row mb-10">
@@ -202,42 +202,43 @@ export default defineComponent({
       }
 
       // Dummy delay
-      setTimeout(() => {
-        // Send login request
-        store
-          .dispatch(Actions.LOGIN, values)
-          .then(() => {
-            Swal.fire({
-              text: "You have successfully logged in!",
-              icon: "success",
-              buttonsStyling: false,
-              confirmButtonText: "Ok, got it!",
-              customClass: {
-                confirmButton: "btn fw-bold btn-light-primary",
-              },
-            }).then(function () {
-              // Go to page after successfully login
-              router.push({ name: "dashboard" });
-            });
-          })
-          .catch(() => {
-            const [error] = Object.keys(store.getters.getErrors);
-            Swal.fire({
-              text: store.getters.getErrors[error],
-              icon: "error",
-              buttonsStyling: false,
-              confirmButtonText: "Try again!",
-              customClass: {
-                confirmButton: "btn fw-bold btn-light-danger",
-              },
-            });
+      // setTimeout(() => {}, 2000);
+      // Send login request
+      store
+        .dispatch(Actions.LOGIN, values)
+        .then(() => {
+          // Swal.fire({
+          //   text: "You have successfully logged in!",
+          //   icon: "success",
+          //   buttonsStyling: false,
+          //   confirmButtonText: "Ok, got it!",
+          //   customClass: {
+          //     confirmButton: "btn fw-bold btn-light-primary",
+          //   },
+          // })
+          // .then(function () {
+          //   // Go to page after successfully login
+          //   router.push({ name: "dashboard" });
+          // });
+          router.push({ name: "dashboard" });
+        })
+        .catch(() => {
+          const [error] = Object.keys(store.getters.getErrors);
+          Swal.fire({
+            text: store.getters.getErrors[error],
+            icon: "error",
+            buttonsStyling: false,
+            confirmButtonText: "Try again!",
+            customClass: {
+              confirmButton: "btn fw-bold btn-light-danger",
+            },
           });
+        });
 
-        //Deactivate indicator
-        submitButton.value?.removeAttribute("data-kt-indicator");
-        // eslint-disable-next-line
-        submitButton.value!.disabled = false;
-      }, 2000);
+      //Deactivate indicator
+      submitButton.value?.removeAttribute("data-kt-indicator");
+      // eslint-disable-next-line
+      submitButton.value!.disabled = false;
     };
 
     return {

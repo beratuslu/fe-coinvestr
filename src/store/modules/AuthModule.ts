@@ -2,27 +2,29 @@ import ApiService from "@/core/services/ApiService";
 import JwtService from "@/core/services/JwtService";
 import { Actions, Mutations } from "@/store/enums/StoreEnums";
 import { Module, Action, Mutation, VuexModule } from "vuex-module-decorators";
-import { AxiosRequestConfig } from "axios";
+// import { AxiosRequestConfig } from "axios";
+import router from "@/router";
 
 export interface User {
   name: string;
   surname: string;
   email: string;
   password: string;
-  api_token: string;
+  token: string;
 }
 
 export interface UserAuthInfo {
-  errors: unknown;
+  errors: Array<string>;
   user: User;
   isAuthenticated: boolean;
 }
 
 @Module
 export default class AuthModule extends VuexModule implements UserAuthInfo {
-  errors = {};
+  errors = [];
   user = {} as User;
-  isAuthenticated = !!JwtService.getToken();
+  // isAuthenticated = !!JwtService.getToken();
+  isAuthenticated = false;
 
   /**
    * Get current user object
@@ -44,7 +46,7 @@ export default class AuthModule extends VuexModule implements UserAuthInfo {
    * Get authentification errors
    * @returns array
    */
-  get getErrors() {
+  get getErrors(): Array<string> {
     return this.errors;
   }
 
@@ -54,16 +56,19 @@ export default class AuthModule extends VuexModule implements UserAuthInfo {
   }
 
   @Mutation
-  [Mutations.SET_AUTH](user) {
+  [Mutations.SET_AUTH](data) {
     this.isAuthenticated = true;
-    this.user = user;
+    this.user = data.user;
     this.errors = [];
-    JwtService.saveToken(this.user.api_token);
+    JwtService.saveToken(data.token);
+    JwtService.saveUser(data.user);
+    ApiService.setHeaderAndUser();
   }
 
   @Mutation
   [Mutations.SET_USER](user) {
     this.user = user;
+    this.isAuthenticated = true;
   }
 
   @Mutation
@@ -77,24 +82,29 @@ export default class AuthModule extends VuexModule implements UserAuthInfo {
     this.user = {} as User;
     this.errors = [];
     JwtService.destroyToken();
+    ApiService.removeHeader();
+    // const router = useRouter();
+    router.push({ name: "sign-in" });
+
+    // ApiService.vueInstance.$router.push({ name: "sign-in" });
+    // App.$router.push({ name: "sign-in" });
   }
 
-  @Action
+  @Action({ rawError: true })
   [Actions.LOGIN](credentials) {
-    const params = {
-      params: {
-        ...credentials,
-      },
-    };
     return new Promise<void>((resolve, reject) => {
-      ApiService.query("login", params)
-        .then(({ data }) => {
-          this.context.commit(Mutations.SET_AUTH, data);
+      ApiService.post("auth/login", credentials)
+        .then((response) => {
+          this.context.commit(Mutations.SET_AUTH, response.data);
           resolve();
         })
-        .catch(({ response }) => {
-          this.context.commit(Mutations.SET_ERROR, response.data.errors);
-          reject();
+        .catch((error) => {
+          this.context.commit(Mutations.SET_ERROR, [
+            error.response.data.message,
+          ]);
+
+          // reject();
+          reject("asdasd1235");
         });
     });
   }
@@ -121,18 +131,14 @@ export default class AuthModule extends VuexModule implements UserAuthInfo {
 
   @Action
   [Actions.FORGOT_PASSWORD](payload) {
-    const params = {
-      params: {
-        ...payload,
-      },
-    };
     return new Promise<void>((resolve, reject) => {
-      ApiService.query("forgot_password", params)
-        .then(({ data }) => {
-          this.context.commit(Mutations.SET_AUTH, data);
+      ApiService.post("forgot_password", payload)
+        .then((response) => {
+          this.context.commit(Mutations.SET_AUTH, response);
           resolve();
         })
         .catch(({ response }) => {
+          console.log(response.data.errors);
           this.context.commit(Mutations.SET_ERROR, response.data.errors);
           reject();
         });
@@ -142,19 +148,13 @@ export default class AuthModule extends VuexModule implements UserAuthInfo {
   @Action
   [Actions.VERIFY_AUTH]() {
     if (JwtService.getToken()) {
-      ApiService.setHeader();
-      const params = {
-        params: {
-          token: JwtService.getToken(),
-        },
-      };
-      ApiService.query("verify_token", params as AxiosRequestConfig)
+      ApiService.setHeaderAndUser();
+      ApiService.get("verify")
         .then(({ data }) => {
           this.context.commit(Mutations.SET_AUTH, data);
         })
         .catch(({ response }) => {
           this.context.commit(Mutations.SET_ERROR, response.data.errors);
-          this.context.commit(Mutations.PURGE_AUTH);
         });
     } else {
       this.context.commit(Mutations.PURGE_AUTH);

@@ -20,7 +20,7 @@ class LayoutService {
    */
   public static initLayout(): void {
     store.dispatch(Actions.ADD_BODY_ATTRIBUTE, {
-      qulifiedName: "id",
+      qualifiedName: "id",
       value: "kt_body",
     });
 
@@ -30,7 +30,7 @@ class LayoutService {
     }
 
     store.dispatch(Actions.ADD_BODY_ATTRIBUTE, {
-      qulifiedName: "style",
+      qualifiedName: "style",
       value: "background-image: url(media/patterns/header-bg.jpg)",
     });
   }

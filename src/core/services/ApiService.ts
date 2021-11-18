@@ -2,8 +2,25 @@ import { App } from "vue";
 import axios from "axios";
 import VueAxios from "vue-axios";
 import JwtService from "@/core/services/JwtService";
+import store from "@/store";
+import { Mutations } from "@/store/enums/StoreEnums";
 import { AxiosResponse, AxiosRequestConfig } from "axios";
+const BASE_URL = process.env.VUE_APP_API_BASE_URL;
 
+axios.interceptors.response.use(function (response) {
+  return response.data;
+});
+const UNAUTHORIZED = 401;
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const { status } = error.response;
+    if (status === UNAUTHORIZED) {
+      store.commit(Mutations.PURGE_AUTH);
+    }
+    return Promise.reject(error);
+  }
+);
 /**
  * @description service to call HTTP request via Axios
  */
@@ -19,18 +36,29 @@ class ApiService {
   public static init(app: App<Element>) {
     ApiService.vueInstance = app;
     ApiService.vueInstance.use(VueAxios, axios);
-    ApiService.vueInstance.axios.defaults.baseURL = process.env.VUE_APP_API_URL;
+    // ApiService.vueInstance.axios.defaults.baseURL = process.env.VUE_APP_API_URL;
+    ApiService.vueInstance.axios.defaults.baseURL = BASE_URL;
   }
 
   /**
    * @description set the default HTTP request headers
    */
-  public static setHeader(): void {
-    ApiService.vueInstance.axios.defaults.headers.common[
-      "Authorization"
-    ] = `Token ${JwtService.getToken()}`;
-    ApiService.vueInstance.axios.defaults.headers.common["Accept"] =
-      "application/json";
+  public static setHeaderAndUser(): void {
+    const tokenFromLocalStorage = JwtService.getToken();
+    if (tokenFromLocalStorage) {
+      ApiService.vueInstance.axios.defaults.headers.common[
+        "Authorization"
+      ] = `bearer ${tokenFromLocalStorage}`;
+    }
+    const userFromLocalStorage = JwtService.getUser();
+
+    if (userFromLocalStorage) {
+      store.commit(Mutations.SET_USER, JSON.parse(userFromLocalStorage));
+    }
+  }
+
+  public static removeHeader(): void {
+    delete axios.defaults.headers.common["Authorization"];
   }
 
   /**

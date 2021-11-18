@@ -35,6 +35,8 @@ import { defineComponent, onMounted } from "vue";
 import { useStore } from "vuex";
 import { Mutations } from "@/store/enums/StoreEnums";
 
+import ApiService from "@/core/services/ApiService";
+
 export default defineComponent({
   name: "app",
   setup() {
@@ -46,6 +48,7 @@ export default defineComponent({
        * remove this to use config only from static config (@/core/config/DefaultLayoutConfig.ts)
        */
       store.commit(Mutations.OVERRIDE_LAYOUT_CONFIG);
+      ApiService.setHeaderAndUser();
     });
   },
 });

@@ -13,7 +13,12 @@
     <div class="d-flex flex-center flex-column flex-column-fluid p-10 pb-lg-20">
       <!--begin::Logo-->
       <a href="#" class="mb-12">
-        <img alt="Logo" src="media/logos/logo-1.svg" class="h-45px" />
+        <!-- <img alt="Logo" src="media/logos/logo-1.svg" class="h-45px" /> -->
+        <img
+          alt="Logo"
+          src="media/logos/coinvestr-logo-with-name.png"
+          class="h-65px"
+        />
       </a>
       <!--end::Logo-->
 
@@ -38,7 +43,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUnmounted } from "vue";
+import { defineComponent, onMounted, onBeforeMount, onUnmounted } from "vue";
 import { useStore } from "vuex";
 import { Actions } from "@/store/enums/StoreEnums";
 
@@ -49,6 +54,7 @@ export default defineComponent({
     const store = useStore();
 
     onMounted(() => {
+      store.dispatch(Actions.REMOVE_BODY_ATTRIBUTE, { qualifiedName: "style" });
       store.dispatch(Actions.ADD_BODY_CLASSNAME, "bg-body");
     });
 
