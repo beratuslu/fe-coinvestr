@@ -17,7 +17,7 @@
         <img
           alt="Logo"
           src="media/logos/coinvestr-logo-with-name.png"
-          class="h-65px"
+          class="h-60px"
         />
       </a>
       <!--end::Logo-->
