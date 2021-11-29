@@ -45,6 +45,11 @@
             src="media/logos/logo-4.png"
             class="logo-default h-25px"
           />
+          <!-- <img
+            alt="Logo"
+            src="media/logos/coinvestr-logo-big.png"
+            class="logo-default h-35px"
+          /> -->
           <img
             alt="Logo"
             src="media/logos/logo-5.png"

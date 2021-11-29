@@ -30,7 +30,7 @@ const config: LayoutConfigTypes = {
     },
   },
   toolbar: {
-    display: true,
+    display: false,
     width: "fixed",
     fixed: {
       desktop: true,
