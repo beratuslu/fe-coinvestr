@@ -156,7 +156,7 @@ export default defineComponent({
         submitButton.value.setAttribute("data-kt-indicator", "on");
       }
 
-      // Dummy delay
+      // Dummy delay1
       // setTimeout(() => {}, 2000);
       // Send login request
       store
