@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onBeforeMount, onUnmounted } from "vue";
+import { defineComponent, onMounted, onUnmounted } from "vue";
 import { useStore } from "vuex";
 import { Actions } from "@/store/enums/StoreEnums";
 
