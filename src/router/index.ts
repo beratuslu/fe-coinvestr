@@ -18,6 +18,33 @@ const routes: Array<RouteRecordRaw> = [
         name: "builder",
         component: () => import("@/views/Builder.vue"),
       },
+
+      {
+        path: "/profile/:userName",
+        name: "profile1",
+        component: () => import("@/components/page-layouts/Profile1.vue"),
+        children: [
+          {
+            path: "overview",
+            name: "profile-overview1",
+            component: () =>
+              import("@/views/crafted/pages/profile/Overview1.vue"),
+          },
+          {
+            path: "followers",
+            name: "followers",
+            component: () =>
+              import("@/views/crafted/pages/profile/Connections1.vue"),
+          },
+          {
+            path: "followings",
+            name: "followings",
+            component: () =>
+              import("@/views/crafted/pages/profile/Connections1.vue"),
+          },
+        ],
+      },
+
       {
         path: "/crafted/pages/profile",
         name: "profile",
