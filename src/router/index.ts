@@ -42,6 +42,27 @@ const routes: Array<RouteRecordRaw> = [
             component: () =>
               import("@/views/crafted/pages/profile/Connections1.vue"),
           },
+
+          {
+            path: "trades",
+            name: "trades",
+            component: () => import("@/views/crafted/pages/profile/Trades.vue"),
+            redirect: { name: "myTrades" },
+            children: [
+              {
+                path: "my-trades",
+                name: "myTrades",
+                component: () =>
+                  import("@/components/widgets/lists/TradeList.vue"),
+              },
+              {
+                path: "copied-trades",
+                name: "copiedTrades",
+                component: () =>
+                  import("@/components/widgets/lists/TradeList.vue"),
+              },
+            ],
+          },
         ],
       },
 

@@ -11,6 +11,7 @@ export default {
   },
   setup() {
     const route = useRoute();
+    const activeTab = ref(route.name);
     const loading = ref(false);
     const cloudinaryName = ref(process.env.VUE_APP_CLOUDINARY_NAME);
 
@@ -66,11 +67,10 @@ export default {
     watch(
       () => route.path,
       (prev, current) => {
-        console.log(
-          "🚀 ~ file: Profile1.vue ~ line 69 ~ setup ~ prev, current",
-          prev,
-          current
-        );
+        userName.value = route.params.userName;
+        activeTab.value = route.name;
+        getData();
+
         // MenuComponent.hideDropdowns(undefined);
         // DrawerComponent.hideAll();
         // check if current user is authenticated
@@ -81,6 +81,7 @@ export default {
       }
     );
     return {
+      activeTab,
       coverPhoto,
       followers,
       followings,
@@ -221,7 +222,7 @@ export default {
 
             <!--begin::Actions-->
             <div class="d-flex my-4">
-              <a
+              <!-- <a
                 href="#"
                 class="btn btn-sm btn-light me-2"
                 id="kt_user_follow_button"
@@ -230,14 +231,14 @@ export default {
                   <inline-svg src="media/icons/duotune/arrows/arr012.svg" />
                 </span>
                 Follow
-              </a>
+              </a> -->
 
               <a
                 href="#"
                 class="btn btn-sm btn-primary me-3"
                 data-bs-toggle="modal"
                 data-bs-target="#kt_modal_offer_a_deal"
-                >Hire Me</a
+                >Follow</a
               >
 
               <!--begin::Menu-->
@@ -422,16 +423,17 @@ export default {
           <li class="nav-item">
             <router-link
               :to="{
-                name: 'profile-overview1',
+                name: 'myTrades',
                 params: { userName },
               }"
               class="nav-link text-active-primary me-6"
-              active-class="active"
+              :class="{
+                active: activeTab == 'myTrades' || activeTab == 'copiedTrades',
+              }"
             >
-              Overview
+              Trades
             </router-link>
           </li>
-          <!--end::Nav item-->
           <!--begin::Nav item-->
           <li class="nav-item">
             <router-link
@@ -455,11 +457,25 @@ export default {
               class="nav-link text-active-primary me-6"
               active-class="active"
             >
-              Followings({{ followings.length }})
+              Following({{ followings.length }})
             </router-link>
           </li>
           <!--end::Nav item-->
 
+          <!--end::Nav item-->
+          <li class="nav-item">
+            <router-link
+              :to="{
+                name: 'profile-overview1',
+                params: { userName },
+              }"
+              class="nav-link text-active-primary me-6"
+              active-class="active"
+            >
+              Overview
+            </router-link>
+          </li>
+          <!--end::Nav item-->
           <!--begin::Nav item-->
           <li class="nav-item">
             <router-link
@@ -494,7 +510,7 @@ export default {
           </li>
           <!--end::Nav item-->
           <!--begin::Nav item-->
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <router-link
               class="nav-link text-active-primary me-6"
               to="/crafted/pages/profile/connections"
@@ -502,7 +518,7 @@ export default {
             >
               Connections
             </router-link>
-          </li>
+          </li> -->
           <!--end::Nav item-->
           <!--begin::Nav item-->
           <li class="nav-item">
