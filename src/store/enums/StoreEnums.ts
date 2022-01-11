@@ -12,6 +12,11 @@ enum Actions {
   UPDATE_USER = "updateUser",
   FORGOT_PASSWORD = "forgotPassword",
   SET_BREADCRUMB_ACTION = "setBreadcrumbAction",
+
+  // ProfileModule
+  UPDATE_PERSONAL_INFO = "updateUserPersonalInfo1",
+  UPDATE_ACCOUNT_INFO = "updateUserAccountInfo1",
+  GET_PROFILE = "getProfile",
 }
 
 enum Mutations {
@@ -27,6 +32,11 @@ enum Mutations {
   RESET_LAYOUT_CONFIG = "resetLayoutConfig",
   OVERRIDE_LAYOUT_CONFIG = "overrideLayoutConfig",
   OVERRIDE_PAGE_LAYOUT_CONFIG = "overridePageLayoutConfig",
+
+  // ProfileModule
+  SET_PERSONAL_INFO = "setPersonalInfo1",
+  SET_ACCOUNT_INFO = "setAccountInfo1",
+  SET_PROFILE = "setProfile",
 }
 
 export { Actions, Mutations };

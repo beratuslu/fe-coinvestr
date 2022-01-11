@@ -4,8 +4,10 @@ import Dropdown3 from "@/components/dropdown/Dropdown3.vue";
 import Dropdown4 from "@/components/dropdown/Dropdown4.vue";
 import ApiService from "@/core/services/ApiService";
 import NewTradeModal from "@/components/modals/forms/NewTradeModal.vue";
+import FollowUserModal from "@/components/modals/forms/FollowUserModal.vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
+import { Actions } from "@/store/enums/StoreEnums";
 
 export default {
   name: "Profile",
@@ -13,6 +15,7 @@ export default {
     Dropdown3,
     Dropdown4,
     NewTradeModal,
+    FollowUserModal,
   },
   setup() {
     const route = useRoute();
@@ -35,7 +38,19 @@ export default {
     const isSelfProfile = computed(() => {
       return store.getters.currentUser.userName == route.params.userName;
     });
-    // console.log("🚀 ~ file: Profile1.vue ~ line 34 ~ pageTitle ~ pageTitle", pageTitle)
+    const isFollowed = computed(() => {
+      let arr = followers.value.filter(
+        (user) => user.id === store.getters.currentUser.id
+      );
+
+      let isFollowed = false;
+      if (arr.length) {
+        isFollowed = true;
+      }
+
+      return isFollowed;
+      // return store.getters.currentUser.userName == route.params.userName;
+    });
     // const isSelfProfile = ref(route.params.userName);
 
     // const active = ref("trades");
@@ -50,49 +65,21 @@ export default {
     // const createTradeLoading = ref(false);
     // const profile = ref({});
     // const followAmount = ref(null);
-    const openAddTradeModal = () => {
-      return false;
-    };
 
-    const getData = () => {
-      loading.value = true;
-      ApiService.get(`api/v1/profile/${userName.value}`)
-        .then(({ data }) => {
-          coverPhoto.value = data.coverPhoto;
-          followers.value = data.followers;
-          followings.value = data.followings;
-          id.value = data.id;
-          lastName.value = data.lastName;
-          name.value = data.name;
-          profilePhoto.value = data.profilePhoto;
+    store.dispatch(Actions.GET_PROFILE, userName.value);
 
-          // list.value = data.awaitingUsers.map((user) => {
-          //   user.color = getRandomColor();
-          //   return user;
-          // });
-        })
-        .catch(() => {
-          console.log("error");
-        })
-        .finally(() => {
-          loading.value = false;
-        });
-    };
-    getData();
+    const currentProfile = computed(() => {
+      return store.getters.currentProfile;
+    });
 
     watch(
       () => route.path,
       (prev, current) => {
-        console.log(
-          "🚀 ~ file: Profile1.vue ~ line 70 ~ setup ~ current",
-          current
-        );
-        console.log("🚀 ~ file: Profile1.vue ~ line 70 ~ setup ~ prev", prev);
         userName.value = route.params.userName;
         activeTab.value = route.name;
 
         if (route.params.userName) {
-          getData();
+          store.dispatch(Actions.GET_PROFILE, userName.value);
         }
 
         // MenuComponent.hideDropdowns(undefined);
@@ -105,18 +92,12 @@ export default {
       }
     );
     return {
-      activeTab,
-      coverPhoto,
-      followers,
-      followings,
-      id,
-      lastName,
-      name,
-      profilePhoto,
-      cloudinaryName,
       userName,
+      cloudinaryName,
+      activeTab,
       isSelfProfile,
-      openAddTradeModal,
+      isFollowed,
+      currentProfile,
     };
   },
 };
@@ -137,8 +118,8 @@ export default {
           >
             <img
               :src="
-                profilePhoto
-                  ? `https://res.cloudinary.com/${cloudinaryName}/image/upload/w_300,h_300,c_fill,g_custom/${profilePhoto}.jpg`
+                currentProfile.profilePhoto
+                  ? `https://res.cloudinary.com/${cloudinaryName}/image/upload/w_300,h_300,c_fill,g_custom/${currentProfile.profilePhoto}.jpg`
                   : `media/avatars/blank.png`
               "
               alt="image"
@@ -181,7 +162,7 @@ export default {
                 <a
                   href="#"
                   class="text-gray-800 text-hover-primary fs-2 fw-bolder me-1"
-                  >{{ name }} {{ lastName }}</a
+                  >{{ currentProfile.name }} {{ currentProfile.lastName }}</a
                 >
                 <a href="#">
                   <span class="svg-icon svg-icon-1 svg-icon-primary">
@@ -265,16 +246,31 @@ export default {
                 :data-bs-target="`#newTradeModal`"
                 >New Trade</a
               >
-              <a
-                v-else
-                href="#"
-                class="btn btn-sm btn-primary me-3"
-                data-kt-menu-trigger="click"
-                data-kt-menu-placement="bottom-end"
-                data-kt-menu-flip="top-end"
-                >Follow</a
-              >
+              <div v-else>
+                <a
+                  v-if="isFollowed"
+                  href="#"
+                  class="btn btn-sm btn-primary me-3 pe-0"
+                  data-kt-menu-trigger="click"
+                  data-kt-menu-placement="bottom-end"
+                  data-kt-menu-flip="top-end"
+                >
+                  Following
+                  <span class="svg-icon svg-icon-3">
+                    <inline-svg src="media/icons/duotune/arrows/arr072.svg" />
+                  </span>
+                </a>
+
+                <a
+                  v-else
+                  class="btn btn-sm btn-primary me-3"
+                  data-bs-toggle="modal"
+                  :data-bs-target="`#followUserModal`"
+                  >Follow</a
+                >
+              </div>
               <NewTradeModal />
+              <FollowUserModal />
 
               <!-- <button
                 type="button"
@@ -488,7 +484,7 @@ export default {
               class="nav-link text-active-primary me-6"
               active-class="active"
             >
-              Followers({{ followers.length }})
+              Followers({{ currentProfile.followers.length }})
             </router-link>
           </li>
           <!--end::Nav item-->
@@ -501,7 +497,7 @@ export default {
               class="nav-link text-active-primary me-6"
               active-class="active"
             >
-              Following({{ followings.length }})
+              Following({{ currentProfile.followings.length }})
             </router-link>
           </li>
           <!--end::Nav item-->

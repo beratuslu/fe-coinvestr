@@ -1,10 +1,11 @@
 <script>
-import { defineComponent, onMounted, ref, watch } from "vue";
+import { defineComponent, computed, ref, watch } from "vue";
 import ConnectionCard from "@/components/cards/ConnectionCard.vue";
 import { setCurrentPageBreadcrumbs } from "@/core/helpers/breadcrumb";
 import { useRoute, useRouter } from "vue-router";
 import ApiService from "@/core/services/ApiService";
 import ConnectionList from "@/components/widgets/lists/ConnectionList.vue";
+import { useStore } from "vuex";
 
 export default defineComponent({
   name: "connectionList",
@@ -14,15 +15,20 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const loading = ref(false);
-    const connectionList = ref([]);
+    // const connectionList = ref([]);
     const connectionType = ref(route.name);
     const userName = ref(route.params.userName);
+    const store = useStore();
 
     const getData = () => {
       loading.value = true;
 
       ApiService.get(`api/v1/profile/${userName.value}`)
         .then(({ data }) => {
+          console.log(
+            "🚀 ~ file: Connections1.vue ~ line 34 ~ .then ~ data",
+            data
+          );
           connectionList.value = data[connectionType.value];
         })
         .catch(() => {
@@ -32,14 +38,18 @@ export default defineComponent({
           loading.value = false;
         });
     };
-    getData();
+    // getData();
+
+    const connectionList = computed(() => {
+      return store.getters.currentProfile[connectionType.value];
+    });
 
     watch(
       () => route.path,
       (prev, current) => {
         connectionType.value = route.name;
-        connectionList.value = [];
-        getData();
+        // connectionList.value = [];
+        // getData();
       }
     );
 

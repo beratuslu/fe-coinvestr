@@ -65,7 +65,9 @@ export default defineComponent({
       (prev, current) => {
         activeTab.value = route.name;
         trades.value = [];
-        getData();
+        if (route.path.includes("/trades/")) {
+          getData();
+        }
       }
     );
     return {
