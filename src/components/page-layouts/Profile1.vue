@@ -269,7 +269,7 @@ export default {
                   >Follow</a
                 >
               </div>
-              <NewTradeModal />
+              <NewTradeModal v-if="isSelfProfile" />
               <FollowUserModal />
 
               <!-- <button
