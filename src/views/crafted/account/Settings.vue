@@ -1277,6 +1277,7 @@
                       >Enter New Email Address</label
                     >
                     <Field
+                      v-model="email1"
                       type="email"
                       class="
                         form-control form-control-lg form-control-solid
@@ -1286,7 +1287,6 @@
                       id="emailaddress"
                       placeholder="Email Address"
                       name="emailaddress"
-                      value="support@keenthemes.com"
                     />
                     <div class="fv-plugins-message-container">
                       <div class="fv-help-block">
@@ -2355,6 +2355,7 @@ export default defineComponent({
     const submitButton5 = ref<HTMLElement | null>(null);
     const updateEmailButton = ref<HTMLElement | null>(null);
     const updatePasswordButton = ref<HTMLElement | null>(null);
+    const email1 = ref<string>("");
 
     const emailFormDisplay = ref(false);
     const passwordFormDisplay = ref(false);
@@ -2539,6 +2540,7 @@ export default defineComponent({
       updatePasswordButton,
       updateEmail,
       updatePassword,
+      email1,
     };
   },
 });

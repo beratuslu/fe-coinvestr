@@ -14,13 +14,17 @@ const UNAUTHORIZED = 401;
 axios.interceptors.response.use(
   (response) => response,
   (error) => {
-    const { status } = error.response;
+    let status = null;
+    if (error.response) {
+      status = error.response.status;
+    }
     if (status === UNAUTHORIZED) {
       store.commit(Mutations.PURGE_AUTH);
     }
     return Promise.reject(error);
   }
 );
+
 /**
  * @description service to call HTTP request via Axios
  */
@@ -84,11 +88,10 @@ class ApiService {
     resource: string,
     slug = "" as string
   ): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios
-      .get(`${resource}/${slug}`)
-      .catch((error) => {
-        throw new Error(`[KT] ApiService ${error}`);
-      });
+    return ApiService.vueInstance.axios.get(`${resource}/${slug}`);
+    // .catch((error) => {
+    //   throw new Error(`[KT] ApiService ${error}`);
+    // });
   }
 
   /**

@@ -1,21 +1,28 @@
 <script>
 import { defineComponent, ref, computed, onMounted, watch } from "vue";
 import Dropdown3 from "@/components/dropdown/Dropdown3.vue";
+import Dropdown4 from "@/components/dropdown/Dropdown4.vue";
 import ApiService from "@/core/services/ApiService";
+import NewTradeModal from "@/components/modals/forms/NewTradeModal.vue";
 import { useRoute, useRouter } from "vue-router";
+import { useStore } from "vuex";
 
 export default {
   name: "Profile",
   components: {
     Dropdown3,
+    Dropdown4,
+    NewTradeModal,
   },
   setup() {
     const route = useRoute();
+    const store = useStore();
     const activeTab = ref(route.name);
     const loading = ref(false);
     const cloudinaryName = ref(process.env.VUE_APP_CLOUDINARY_NAME);
 
     const coverPhoto = ref(null);
+
     const followers = ref([]);
     const followings = ref([]);
     const id = ref(null);
@@ -24,6 +31,12 @@ export default {
     const profilePhoto = ref(null);
 
     const userName = ref(route.params.userName);
+
+    const isSelfProfile = computed(() => {
+      return store.getters.currentUser.userName == route.params.userName;
+    });
+    // console.log("🚀 ~ file: Profile1.vue ~ line 34 ~ pageTitle ~ pageTitle", pageTitle)
+    // const isSelfProfile = ref(route.params.userName);
 
     // const active = ref("trades");
     // const visible = ref(false);
@@ -37,6 +50,9 @@ export default {
     // const createTradeLoading = ref(false);
     // const profile = ref({});
     // const followAmount = ref(null);
+    const openAddTradeModal = () => {
+      return false;
+    };
 
     const getData = () => {
       loading.value = true;
@@ -67,9 +83,17 @@ export default {
     watch(
       () => route.path,
       (prev, current) => {
+        console.log(
+          "🚀 ~ file: Profile1.vue ~ line 70 ~ setup ~ current",
+          current
+        );
+        console.log("🚀 ~ file: Profile1.vue ~ line 70 ~ setup ~ prev", prev);
         userName.value = route.params.userName;
         activeTab.value = route.name;
-        getData();
+
+        if (route.params.userName) {
+          getData();
+        }
 
         // MenuComponent.hideDropdowns(undefined);
         // DrawerComponent.hideAll();
@@ -91,6 +115,8 @@ export default {
       profilePhoto,
       cloudinaryName,
       userName,
+      isSelfProfile,
+      openAddTradeModal,
     };
   },
 };
@@ -232,18 +258,37 @@ export default {
                 </span>
                 Follow
               </a> -->
-
               <a
-                href="#"
+                v-if="isSelfProfile"
                 class="btn btn-sm btn-primary me-3"
                 data-bs-toggle="modal"
-                data-bs-target="#kt_modal_offer_a_deal"
+                :data-bs-target="`#newTradeModal`"
+                >New Trade</a
+              >
+              <a
+                v-else
+                href="#"
+                class="btn btn-sm btn-primary me-3"
+                data-kt-menu-trigger="click"
+                data-kt-menu-placement="bottom-end"
+                data-kt-menu-flip="top-end"
                 >Follow</a
               >
+              <NewTradeModal />
 
+              <!-- <button
+                type="button"
+                class="btn btn-primary er fs-6 px-8 py-4"
+                data-bs-toggle="modal"
+                :data-bs-target="`#newTradeModal`"
+              >
+                open modal
+              </button> -->
+              <Dropdown3></Dropdown3>
+              <Dropdown4></Dropdown4>
               <!--begin::Menu-->
               <div class="me-0">
-                <button
+                <!-- <button
                   class="
                     btn btn-sm btn-icon btn-bg-light btn-active-color-primary
                   "
@@ -252,8 +297,7 @@ export default {
                   data-kt-menu-flip="top-end"
                 >
                   <i class="bi bi-three-dots fs-3"></i>
-                </button>
-                <Dropdown3></Dropdown3>
+                </button> -->
               </div>
               <!--end::Menu-->
             </div>
@@ -458,76 +502,6 @@ export default {
               active-class="active"
             >
               Following({{ followings.length }})
-            </router-link>
-          </li>
-          <!--end::Nav item-->
-
-          <!--end::Nav item-->
-          <li class="nav-item">
-            <router-link
-              :to="{
-                name: 'profile-overview1',
-                params: { userName },
-              }"
-              class="nav-link text-active-primary me-6"
-              active-class="active"
-            >
-              Overview
-            </router-link>
-          </li>
-          <!--end::Nav item-->
-          <!--begin::Nav item-->
-          <li class="nav-item">
-            <router-link
-              class="nav-link text-active-primary me-6"
-              to="/crafted/pages/profile/projects"
-              active-class="active"
-            >
-              Projects
-            </router-link>
-          </li>
-          <!--end::Nav item-->
-          <!--begin::Nav item-->
-          <li class="nav-item">
-            <router-link
-              class="nav-link text-active-primary me-6"
-              to="/crafted/pages/profile/campaigns"
-              active-class="active"
-            >
-              Campaigns
-            </router-link>
-          </li>
-          <!--end::Nav item-->
-          <!--begin::Nav item-->
-          <li class="nav-item">
-            <router-link
-              class="nav-link text-active-primary me-6"
-              to="/crafted/pages/profile/documents"
-              active-class="active"
-            >
-              Documents
-            </router-link>
-          </li>
-          <!--end::Nav item-->
-          <!--begin::Nav item-->
-          <!-- <li class="nav-item">
-            <router-link
-              class="nav-link text-active-primary me-6"
-              to="/crafted/pages/profile/connections"
-              active-class="active"
-            >
-              Connections
-            </router-link>
-          </li> -->
-          <!--end::Nav item-->
-          <!--begin::Nav item-->
-          <li class="nav-item">
-            <router-link
-              class="nav-link text-active-primary me-6"
-              to="/crafted/pages/profile/activity"
-              active-class="active"
-            >
-              Activity
             </router-link>
           </li>
           <!--end::Nav item-->

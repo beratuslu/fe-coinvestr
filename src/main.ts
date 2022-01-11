@@ -1,5 +1,6 @@
 import { createApp } from "vue";
 import App from "./App.vue";
+import moment from "moment";
 
 /*
 TIP: To get started with clean router change path to @/router/clean.ts.
@@ -20,6 +21,7 @@ import "@/core/plugins/prismjs";
 import "bootstrap";
 
 const app = createApp(App);
+app.provide("moment", moment);
 
 app.use(store);
 app.use(router);

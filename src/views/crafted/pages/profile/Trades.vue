@@ -10,6 +10,7 @@ import { defineComponent, ref, watch } from "vue";
 // import KTActivityItem8 from "@/layout/header/partials/activity-timeline/Item8.vue";
 import TradeList from "@/components/widgets/lists/TradeList.vue";
 import { useRoute, useRouter } from "vue-router";
+import ApiService from "@/core/services/ApiService";
 
 export default defineComponent({
   name: "Trades",
@@ -27,15 +28,49 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const activeTab = ref(route.name);
+    const loading = ref(true);
+    const trades = ref([]);
+
+    const getData = () => {
+      loading.value = true;
+      ApiService.post(`api/v1/profile/user-trades`, {
+        recordType: activeTab.value,
+        pagination: { pageSize: 10, pageNumber: 1 },
+      })
+        .then(({ data }) => {
+          trades.value = data.map((trade) => {
+            const tradeToReturn = trade;
+            const { helpDeskRequestUrl } = trade;
+            if (trade.errored) {
+              tradeToReturn.activities.push({
+                helpDeskRequestUrl,
+                type: "error",
+              });
+            }
+
+            return tradeToReturn;
+          });
+        })
+        .catch(() => {
+          console.log("error");
+        })
+        .finally(() => {
+          loading.value = false;
+        });
+    };
+    getData();
 
     watch(
       () => route.path,
       (prev, current) => {
         activeTab.value = route.name;
+        trades.value = [];
+        getData();
       }
     );
     return {
       activeTab,
+      trades,
     };
   },
 });
@@ -89,7 +124,7 @@ export default defineComponent({
     <!--end::Card head-->
 
     <!--begin::Card body-->
-    <router-view></router-view>
+    <router-view :list="trades"></router-view>
     <!--end::Card body-->
   </div>
 </template>

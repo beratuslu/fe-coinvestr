@@ -38,6 +38,7 @@ export default defineComponent({
       () => route.path,
       (prev, current) => {
         connectionType.value = route.name;
+        connectionList.value = [];
         getData();
       }
     );

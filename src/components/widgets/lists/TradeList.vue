@@ -1,9 +1,12 @@
-<script lang="ts">
+<script>
 import { defineComponent, ref } from "vue";
+import ApiService from "@/core/services/ApiService";
+
 // import Dropdown2 from "@/components/dropdown/Dropdown2.vue";
 
 export default defineComponent({
-  name: "kt-widget-2",
+  name: "TradeList",
+  inject: ["moment"],
   components: {
     // Dropdown2,
   },
@@ -13,7 +16,60 @@ export default defineComponent({
   },
   setup() {
     const cloudinaryName = ref(process.env.VUE_APP_CLOUDINARY_NAME);
+    const loading = ref(true);
+    const colors = {
+      buyOrderPlaced: "text-primary",
+      buyOrderPartiallyFilled: "text-success",
+      buyOrderFilled: "text-success",
+
+      profitSellOrderPlaced: "text-primary",
+      profitSellOrderPartiallyFilled: "text-success",
+      profitSellOrderFilled: "text-success",
+
+      stopSellOrderPlaced: "text-warning",
+      stopSellOrderPartiallyFilled: "text-danger",
+      stopSellOrderFilled: "text-danger",
+
+      profitSellOrderCanceled: "text-gray-500",
+      stopSellOrderCanceled: "text-gray-500",
+
+      error: "text-danger",
+    };
+    const getActivityIconColorAndSizeObj = (activity) => {
+      let obj = {};
+      obj[colors[activity.type]] = true;
+      obj["fa"] = true;
+      obj["far"] = true;
+      obj["fas"] = true;
+      obj["fa-genderless"] = true;
+      obj["fs-1"] = true;
+
+      if (activity.type === "profitSellOrderPartiallyFilled") {
+        obj["fas-plus-circle"] = true;
+        obj["fa-genderless"] = false;
+      }
+      if (activity.type === "profitSellOrderFilled") {
+        obj["fa-check-circle"] = true;
+        obj["fa-genderless"] = false;
+      }
+      if (activity.type === "stopSellOrderPartiallyFilled") {
+        obj["fa-minus-circle"] = true;
+        obj["fa-genderless"] = false;
+      }
+      if (activity.type === "stopSellOrderFilled") {
+        obj["fa-times-circle"] = true;
+        obj["fa-genderless"] = false;
+      }
+      if (activity.helpDeskRequestUrl) {
+        obj["fa-exclamation"] = true;
+        obj["fa-genderless"] = false;
+      }
+
+      return obj;
+    };
+
     return {
+      getActivityIconColorAndSizeObj,
       cloudinaryName,
     };
   },
@@ -24,13 +80,13 @@ export default defineComponent({
   <!--begin::Body-->
   <div class="card-body pt-5 overflow-auto">
     <!--begin::Accordion-->
-    <div style="min-width: 1154px" class="accordion" id="kt_accordion_1">
-      <div
-        class="accordion-item"
-        v-for="(item, index) in [{ id: 1 }, { id: 2 }, { id: 3 }]"
-        :key="item.id"
-      >
-        <h2 class="accordion-header" :id="`kt_accordion_1_header_${item.id}`">
+    <p v-if="!list.length">No trades.</p>
+    <div v-else style="min-width: 1154px" class="accordion" id="kt_accordion_1">
+      <div class="accordion-item" v-for="(item, index) in list" :key="item.id">
+        <h2
+          class="accordion-header d-flex"
+          :id="`kt_accordion_1_header_${item.id}`"
+        >
           <button
             class="accordion-button fs-4 fw-bold"
             :class="{ collapsed: index != 0 }"
@@ -40,7 +96,92 @@ export default defineComponent({
             :aria-expanded="index == 0"
             :aria-controls="`kt_accordion_1_header_${item.id}`"
           >
-            Accordion Item #{{ item.id }}
+            <!-- Accordion Item #{{ item.id }} -->
+
+            <!--begin::Item-->
+            <div
+              style="width: 200px"
+              class="d-flex align-items-center col-xxl-3"
+            >
+              <!--begin::Avatar-->
+              <router-link
+                :to="`/profile/${item.user.userName}/overview`"
+                class="text-dark fw-bolder text-hover-primary fs-6"
+              >
+                <div class="symbol symbol-50px me-5">
+                  <img
+                    :src="
+                      item.user.profilePhoto
+                        ? `https://res.cloudinary.com/${cloudinaryName}/image/upload/w_300,h_300,c_fill,g_custom/${item.user.profilePhoto}.jpg`
+                        : `media/avatars/blank.png`
+                    "
+                    alt=""
+                  />
+                </div>
+              </router-link>
+              <!--end::Avatar-->
+
+              <!--begin::Text-->
+              <div class="">
+                <router-link
+                  :to="`/profile/${item.user.userName}/overview`"
+                  class="text-gray-700 fw-bolder text-hover-primary fs-6"
+                >
+                  <div class="">
+                    {{
+                      item.user.userName.length > 12
+                        ? `${item.user.userName.substring(0, 12)}...`
+                        : item.user.userName
+                    }}
+                  </div>
+                </router-link>
+
+                <span class="text-muted d-block fw-bold">{{
+                  item.description
+                }}</span>
+              </div>
+              <!--end::Text-->
+            </div>
+            <div class="text-gray-700 w-150px fs-6">
+              {{ item.symbol.split("BTC")[0] }}_BTC
+            </div>
+            <div class="text-gray-700 w-150px fs-6">{{ item.buyPrice }}</div>
+            <div class="text-gray-700 w-150px fs-6">{{ item.profitPrice }}</div>
+            <div class="text-gray-700 w-150px fs-6">
+              {{ item.stopLossPrice }}
+            </div>
+            <div class="text-gray-700 w-150px fs-6">
+              {{ moment(item.createTime).format("YYYY-MM-DD HH:mm:ss.SSS") }}
+            </div>
+            <div class="w-250px d-flex align-items-center">
+              <div class="progress">
+                <div
+                  class="progress-bar bg-success"
+                  role="progressbar"
+                  :style="`width: ${item.status.profit}%`"
+                  :aria-valuenow="item.status.profit"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                ></div>
+                <div
+                  class="progress-bar bg-danger"
+                  role="progressbar"
+                  :style="`width: ${item.status.stopLoss}%`"
+                  :aria-valuenow="item.status.stopLoss"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                ></div>
+              </div>
+              <p class="text-gray-700 fs-7 mb-0 ms-4">
+                %{{
+                  (item.status.profit + item.status.stopLoss)
+                    .toFixed(2)
+                    .replace(/\.00$/, "")
+                }}
+              </p>
+            </div>
+
+            <!--end::Item-->
           </button>
         </h2>
         <div
@@ -54,186 +195,55 @@ export default defineComponent({
             <!--begin::Timeline-->
             <div class="timeline-label">
               <!--begin::Item-->
-              <div class="timeline-item">
-                <!--begin::Label-->
-                <div class="timeline-label fw-bolder text-gray-800 fs-6">
-                  08:42
+              <div
+                class="timeline-item"
+                v-for="activity in item.activities"
+                :key="activity.id"
+              >
+                <div class="timeline-label fw-bolder text-gray-400 fs-6">
+                  {{ moment(activity.createTime).format("HH:mm") }}
                 </div>
-                <!--end::Label-->
 
-                <!--begin::Badge-->
                 <div class="timeline-badge">
-                  <i class="fa fa-genderless text-warning fs-1"></i>
+                  <!-- class="fa fa-genderless text-warning fs-1" -->
+                  <i :class="getActivityIconColorAndSizeObj(activity)"></i>
                 </div>
-                <!--end::Badge-->
 
-                <!--begin::Text-->
-                <div class="fw-mormal timeline-content text-muted ps-3">
-                  Outlines keep you honest. And keep structure
+                <div class="fw-normal timeline-content text-muted ps-3">
+                  <span
+                    v-if="!activity.helpDeskRequestUrl"
+                    className="activity text-gray-700 fw-bolder"
+                  >
+                    {{ activity.title }}
+                  </span>
+                  <span
+                    v-if="!activity.helpDeskRequestUrl"
+                    className="amountSymbol text-primary"
+                  >
+                    {{ activity.symbol.split("BTC")[0] }}
+                    <strong>{{ activity.qty }}</strong>
+                  </span>
+                  <span class="text-gray-700" v-else>
+                    We encountered an error while processing your copy trade. We
+                    created a
+                    <a rel="noreferrer" target="_blank" href="#asdasd">
+                      help desk request
+                    </a>
+                    to solve the problem together.
+                  </span>
+                  <span
+                    v-if="!activity.helpDeskRequestUrl"
+                    className="createDate text-gray-600"
+                  >
+                    {{
+                      moment(activity.createTime).format(
+                        "YYYY-MM-DD HH:mm:ss.SSS"
+                      )
+                    }}
+                  </span>
                 </div>
-                <!--end::Text-->
               </div>
-              <!--end::Item-->
 
-              <!--begin::Item-->
-              <div class="timeline-item">
-                <!--begin::Label-->
-                <div class="timeline-label fw-bolder text-gray-800 fs-6">
-                  10:00
-                </div>
-                <!--end::Label-->
-
-                <!--begin::Badge-->
-                <div class="timeline-badge">
-                  <i class="fa fa-genderless text-success fs-1"></i>
-                </div>
-                <!--end::Badge-->
-
-                <!--begin::Content-->
-                <div class="timeline-content d-flex">
-                  <span class="fw-bolder text-gray-800 ps-3">AEOL meeting</span>
-                </div>
-                <!--end::Content-->
-              </div>
-              <!--end::Item-->
-
-              <!--begin::Item-->
-              <div class="timeline-item">
-                <!--begin::Label-->
-                <div class="timeline-label fw-bolder text-gray-800 fs-6">
-                  14:37
-                </div>
-                <!--end::Label-->
-
-                <!--begin::Badge-->
-                <div class="timeline-badge">
-                  <i class="fa fa-genderless text-danger fs-1"></i>
-                </div>
-                <!--end::Badge-->
-
-                <!--begin::Desc-->
-                <div class="timeline-content fw-bolder text-gray-800 ps-3">
-                  Make deposit
-                  <a href="#" class="text-primary">USD 700</a>. to ESL
-                </div>
-                <!--end::Desc-->
-              </div>
-              <!--end::Item-->
-
-              <!--begin::Item-->
-              <div class="timeline-item">
-                <!--begin::Label-->
-                <div class="timeline-label fw-bolder text-gray-800 fs-6">
-                  16:50
-                </div>
-                <!--end::Label-->
-
-                <!--begin::Badge-->
-                <div class="timeline-badge">
-                  <i class="fa fa-genderless text-primary fs-1"></i>
-                </div>
-                <!--end::Badge-->
-
-                <!--begin::Text-->
-                <div class="timeline-content fw-mormal text-muted ps-3">
-                  Indulging in poorly driving and keep structure keep great
-                  Indulging in poorly driving and keep structure keep great
-                  Indulging in poorly driving and keep structure keep great
-                  Indulging in poorly driving and keep structure keep great
-                  Indulging in poorly driving and keep structure keep great
-                </div>
-                <!--end::Text-->
-              </div>
-              <!--end::Item-->
-
-              <!--begin::Item-->
-              <div class="timeline-item">
-                <!--begin::Label-->
-                <div class="timeline-label fw-bolder text-gray-800 fs-6">
-                  21:03
-                </div>
-                <!--end::Label-->
-
-                <!--begin::Badge-->
-                <div class="timeline-badge">
-                  <i class="fa fa-genderless text-danger fs-1"></i>
-                </div>
-                <!--end::Badge-->
-
-                <!--begin::Desc-->
-                <div class="timeline-content fw-bold text-gray-800 ps-3">
-                  New order placed
-                  <a href="#" class="text-primary">#XF-2356</a>.
-                </div>
-                <!--end::Desc-->
-              </div>
-              <!--end::Item-->
-
-              <!--begin::Item-->
-              <div class="timeline-item">
-                <!--begin::Label-->
-                <div class="timeline-label fw-bolder text-gray-800 fs-6">
-                  16:50
-                </div>
-                <!--end::Label-->
-
-                <!--begin::Badge-->
-                <div class="timeline-badge">
-                  <i class="fa fa-genderless text-primary fs-1"></i>
-                </div>
-                <!--end::Badge-->
-
-                <!--begin::Text-->
-                <div class="timeline-content fw-mormal text-muted ps-3">
-                  Indulging in poorly driving and keep structure keep great
-                </div>
-                <!--end::Text-->
-              </div>
-              <!--end::Item-->
-
-              <!--begin::Item-->
-              <div class="timeline-item">
-                <!--begin::Label-->
-                <div class="timeline-label fw-bolder text-gray-800 fs-6">
-                  21:03
-                </div>
-                <!--end::Label-->
-
-                <!--begin::Badge-->
-                <div class="timeline-badge">
-                  <i class="fa fa-genderless text-danger fs-1"></i>
-                </div>
-                <!--end::Badge-->
-
-                <!--begin::Desc-->
-                <div class="timeline-content fw-bold text-gray-800 ps-3">
-                  New order placed
-                  <a href="#" class="text-primary">#XF-2356</a>.
-                </div>
-                <!--end::Desc-->
-              </div>
-              <!--end::Item-->
-
-              <!--begin::Item-->
-              <div class="timeline-item">
-                <!--begin::Label-->
-                <div class="timeline-label fw-bolder text-gray-800 fs-6">
-                  10:30
-                </div>
-                <!--end::Label-->
-
-                <!--begin::Badge-->
-                <div class="timeline-badge">
-                  <i class="fa fa-genderless text-success fs-1"></i>
-                </div>
-                <!--end::Badge-->
-
-                <!--begin::Text-->
-                <div class="timeline-content fw-mormal text-muted ps-3">
-                  Finance KPI Mobile app launch preparion meeting
-                </div>
-                <!--end::Text-->
-              </div>
               <!--end::Item-->
             </div>
             <!--end::Timeline-->
@@ -245,3 +255,30 @@ export default defineComponent({
   </div>
   <!--end: Card Body-->
 </template>
+
+<style lang="scss" scoped>
+.accordion-button {
+  padding: 0.75rem 1.5rem;
+}
+.progress {
+  background-color: #ddd;
+  height: 0.6rem;
+  width: 150px;
+}
+.timeline-content {
+  span {
+    margin-left: 10px;
+    display: inline-block;
+
+    &.activity {
+      width: 200px;
+    }
+    &.amountSymbol {
+      width: 120px;
+    }
+    &.createDate {
+      width: 200px;
+    }
+  }
+}
+</style>
