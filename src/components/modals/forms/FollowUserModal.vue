@@ -1,11 +1,13 @@
 <script>
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, computed } from "vue";
 import { Form, ErrorMessage, Field } from "vee-validate";
 import { hideModal } from "@/core/helpers/dom";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import * as Yup from "yup";
 import { ElMessage } from "element-plus";
+import { useStore } from "vuex";
+import { Actions } from "@/store/enums/StoreEnums";
 
 export default defineComponent({
   name: "FollowUserModal",
@@ -13,7 +15,11 @@ export default defineComponent({
     Form,
     Field,
   },
-  setup() {
+  props: {
+    updating: Boolean,
+  },
+  setup(props) {
+    const store = useStore();
     const formRef = ref(null);
     const followUserModalRef = ref(null);
     const loading = ref(false);
@@ -30,13 +36,27 @@ export default defineComponent({
         .typeError("should be a number"),
     });
 
+    const currentProfile = computed(() => {
+      return store.getters.currentProfile;
+    });
+
     function onSubmit(values) {
       loading.value = true;
-      ApiService.post(`api/v1/profile/follow`, formData.value)
+
+      console.log(
+        "🚀 ~ file: FollowUserModal.vue ~ line 42 ~ onSubmit ~ currentProfile",
+        currentProfile.value.id
+      );
+      const postData = {
+        traderId: currentProfile.value.id,
+        ...formData.value,
+      };
+      ApiService.post(`api/v1/profile/follow`, postData)
         .then((response) => {
-          ElMessage.success(response.message || "Trade created successfully!");
+          ElMessage.success(response.message || "You are following this user!");
           hideModal(followUserModalRef.value);
           formRef.value.resetForm();
+          store.dispatch(Actions.GET_PROFILE, currentProfile.value.userName);
         })
         .catch((err) => {
           ElMessage.error(err.message || "Server error");

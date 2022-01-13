@@ -2,6 +2,8 @@
 import { defineComponent, ref, computed, onMounted, watch } from "vue";
 import Dropdown3 from "@/components/dropdown/Dropdown3.vue";
 import Dropdown4 from "@/components/dropdown/Dropdown4.vue";
+import FollowingDropdown from "@/components/dropdown/FollowingDropdown.vue";
+
 import ApiService from "@/core/services/ApiService";
 import NewTradeModal from "@/components/modals/forms/NewTradeModal.vue";
 import FollowUserModal from "@/components/modals/forms/FollowUserModal.vue";
@@ -16,6 +18,7 @@ export default {
     Dropdown4,
     NewTradeModal,
     FollowUserModal,
+    FollowingDropdown,
   },
   setup() {
     const route = useRoute();
@@ -24,22 +27,13 @@ export default {
     const loading = ref(false);
     const cloudinaryName = ref(process.env.VUE_APP_CLOUDINARY_NAME);
 
-    const coverPhoto = ref(null);
-
-    const followers = ref([]);
-    const followings = ref([]);
-    const id = ref(null);
-    const lastName = ref(null);
-    const name = ref(".");
-    const profilePhoto = ref(null);
-
     const userName = ref(route.params.userName);
 
     const isSelfProfile = computed(() => {
       return store.getters.currentUser.userName == route.params.userName;
     });
     const isFollowed = computed(() => {
-      let arr = followers.value.filter(
+      let arr = store.getters.currentProfile.followers.filter(
         (user) => user.id === store.getters.currentUser.id
       );
 
@@ -47,24 +41,8 @@ export default {
       if (arr.length) {
         isFollowed = true;
       }
-
       return isFollowed;
-      // return store.getters.currentUser.userName == route.params.userName;
     });
-    // const isSelfProfile = ref(route.params.userName);
-
-    // const active = ref("trades");
-    // const visible = ref(false);
-    // const recordType = ref("myTrades");
-    // const pageSize = ref(10);
-    // const tradesPageNumber = ref(1);
-    // const trades = ref({});
-    // const symbols = ref([]);
-    // const followUserModalVisible = ref(false);
-    // const newTradeModalVisible = ref(false);
-    // const createTradeLoading = ref(false);
-    // const profile = ref({});
-    // const followAmount = ref(null);
 
     store.dispatch(Actions.GET_PROFILE, userName.value);
 
@@ -247,22 +225,48 @@ export default {
                 >New Trade</a
               >
               <div v-else>
-                <a
-                  v-if="isFollowed"
-                  href="#"
-                  class="btn btn-sm btn-primary me-3 pe-0"
-                  data-kt-menu-trigger="click"
-                  data-kt-menu-placement="bottom-end"
-                  data-kt-menu-flip="top-end"
-                >
-                  Following
-                  <span class="svg-icon svg-icon-3">
-                    <inline-svg src="media/icons/duotune/arrows/arr072.svg" />
-                  </span>
-                </a>
+                <div v-show="isFollowed">
+                  <a
+                    class="btn btn-sm btn-primary me-3 pe-0"
+                    data-kt-menu-trigger="click"
+                    data-kt-menu-placement="bottom-end"
+                    data-kt-menu-flip="top-end"
+                  >
+                    Following
+                    <span class="svg-icon svg-icon-3">
+                      <inline-svg src="media/icons/duotune/arrows/arr072.svg" />
+                    </span>
+                  </a>
+
+                  <FollowingDropdown></FollowingDropdown>
+                  <!-- <Dropdown4></Dropdown4> -->
+                  <!-- <Dropdown3></Dropdown3> -->
+                  <!-- <button
+                    type="button"
+                    class="
+                      btn
+                      btn-sm
+                      btn-icon
+                      btn-color-primary
+                      btn-active-light-primary
+                    "
+                    data-kt-menu-trigger="click"
+                    data-kt-menu-placement="bottom-end"
+                    data-kt-menu-flip="top-end"
+                  >
+                    <span class="svg-icon svg-icon-2">
+                      Following1
+                      <inline-svg src="media/icons/duotune/arrows/arr072.svg" />
+                    </span>
+                  </button>
+                  <Dropdown3></Dropdown3> -->
+                </div>
+
+                <Dropdown4></Dropdown4>
+                <Dropdown3></Dropdown3>
 
                 <a
-                  v-else
+                  v-show="!isFollowed"
                   class="btn btn-sm btn-primary me-3"
                   data-bs-toggle="modal"
                   :data-bs-target="`#followUserModal`"
@@ -270,21 +274,11 @@ export default {
                 >
               </div>
               <NewTradeModal v-if="isSelfProfile" />
-              <FollowUserModal />
+              <FollowUserModal :updating="isFollowed" v-if="!isSelfProfile" />
 
-              <!-- <button
-                type="button"
-                class="btn btn-primary er fs-6 px-8 py-4"
-                data-bs-toggle="modal"
-                :data-bs-target="`#newTradeModal`"
-              >
-                open modal
-              </button> -->
-              <Dropdown3></Dropdown3>
-              <Dropdown4></Dropdown4>
               <!--begin::Menu-->
-              <div class="me-0">
-                <!-- <button
+              <!-- <div class="me-0">
+                <button
                   class="
                     btn btn-sm btn-icon btn-bg-light btn-active-color-primary
                   "
@@ -293,8 +287,10 @@ export default {
                   data-kt-menu-flip="top-end"
                 >
                   <i class="bi bi-three-dots fs-3"></i>
-                </button> -->
-              </div>
+                </button>
+                <Dropdown4></Dropdown4>
+                <Dropdown3></Dropdown3>
+              </div> -->
               <!--end::Menu-->
             </div>
             <!--end::Actions-->

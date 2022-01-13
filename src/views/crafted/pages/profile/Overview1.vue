@@ -10,6 +10,7 @@
     </div>
 
     <div class="col-xl-6">
+      <ModalTestCard widget-classes="mb-5 mb-xxl-8"></ModalTestCard>
       <KTChartWidget1 widget-classes="mb-5 mb-xxl-8"></KTChartWidget1>
 
       <KTListWidget5 widget-classes="mb-5 mb-xxl-8"></KTListWidget5>
@@ -30,6 +31,8 @@ import KTWidget6 from "@/components/widgets/feeds/Widget6.vue";
 import KTChartWidget1 from "@/components/widgets/charts/Widget1.vue";
 import KTListWidget5 from "@/components/widgets/lists/Widget5.vue";
 import KTEngageWidget1 from "@/components/widgets/engage/Widget1.vue";
+import ModalTestCard from "@/components/widgets/engage/ModalTestCard.vue";
+
 import { setCurrentPageBreadcrumbs } from "@/core/helpers/breadcrumb";
 
 export default defineComponent({
@@ -44,6 +47,7 @@ export default defineComponent({
     KTChartWidget1,
     KTListWidget5,
     KTEngageWidget1,
+    ModalTestCard,
   },
   setup() {
     onMounted(() => {
