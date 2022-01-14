@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, ref, computed, onMounted, watch } from "vue";
+import { defineComponent, ref, computed, inject, watch } from "vue";
 import Dropdown3 from "@/components/dropdown/Dropdown3.vue";
 import Dropdown4 from "@/components/dropdown/Dropdown4.vue";
 import FollowingDropdown from "@/components/dropdown/FollowingDropdown.vue";
@@ -14,8 +14,8 @@ import { Actions } from "@/store/enums/StoreEnums";
 export default {
   name: "Profile",
   components: {
-    Dropdown3,
-    Dropdown4,
+    // Dropdown3,
+    // Dropdown4,
     NewTradeModal,
     FollowUserModal,
     FollowingDropdown,
@@ -23,18 +23,25 @@ export default {
   setup() {
     const route = useRoute();
     const store = useStore();
+    const $vfm = inject("$vfm");
     const activeTab = ref(route.name);
     const loading = ref(false);
     const cloudinaryName = ref(process.env.VUE_APP_CLOUDINARY_NAME);
 
+    const newTradeModalOpened = ref(false);
+    const newTradeModalOpen = ref(false);
+
+    const followUserModalOpened = ref(false);
+    const followUserModalOpen = ref(false);
+
     const userName = ref(route.params.userName);
 
     const isSelfProfile = computed(() => {
-      return store.getters.currentUser.userName == route.params.userName;
+      return store.getters.authenticatedUser.userName == route.params.userName;
     });
     const isFollowed = computed(() => {
       let arr = store.getters.currentProfile.followers.filter(
-        (user) => user.id === store.getters.currentUser.id
+        (user) => user.id === store.getters.authenticatedUser.id
       );
 
       let isFollowed = false;
@@ -52,7 +59,7 @@ export default {
 
     watch(
       () => route.path,
-      (prev, current) => {
+      (current, prev) => {
         userName.value = route.params.userName;
         activeTab.value = route.name;
 
@@ -76,11 +83,36 @@ export default {
       isSelfProfile,
       isFollowed,
       currentProfile,
+      newTradeModalOpened,
+      newTradeModalOpen,
+      followUserModalOpened,
+      followUserModalOpen,
     };
   },
 };
 </script>
 <template>
+  <vue-final-modal
+    v-model="newTradeModalOpen"
+    @opened="newTradeModalOpened = true"
+    @closed="newTradeModalOpened = false"
+    name="newTradeModal"
+    :esc-to-close="true"
+  >
+    <NewTradeModal :modal-opened="newTradeModalOpened" />
+  </vue-final-modal>
+  <vue-final-modal
+    v-model="followUserModalOpen"
+    @opened="followUserModalOpened = true"
+    @closed="followUserModalOpened = false"
+    name="followUserModal"
+    :esc-to-close="true"
+  >
+    <FollowUserModal
+      :updating="isFollowed"
+      :modal-opened="followUserModalOpened"
+    />
+  </vue-final-modal>
   <!--begin::Navbar-->
   <div class="card mb-5 mb-xxl-8">
     <div class="card-body pt-9 pb-0">
@@ -219,9 +251,8 @@ export default {
               </a> -->
               <a
                 v-if="isSelfProfile"
+                @click="newTradeModalOpen = true"
                 class="btn btn-sm btn-primary me-3"
-                data-bs-toggle="modal"
-                :data-bs-target="`#newTradeModal`"
                 >New Trade</a
               >
               <div v-else>
@@ -237,44 +268,19 @@ export default {
                       <inline-svg src="media/icons/duotune/arrows/arr072.svg" />
                     </span>
                   </a>
-
                   <FollowingDropdown></FollowingDropdown>
-                  <!-- <Dropdown4></Dropdown4> -->
-                  <!-- <Dropdown3></Dropdown3> -->
-                  <!-- <button
-                    type="button"
-                    class="
-                      btn
-                      btn-sm
-                      btn-icon
-                      btn-color-primary
-                      btn-active-light-primary
-                    "
-                    data-kt-menu-trigger="click"
-                    data-kt-menu-placement="bottom-end"
-                    data-kt-menu-flip="top-end"
-                  >
-                    <span class="svg-icon svg-icon-2">
-                      Following1
-                      <inline-svg src="media/icons/duotune/arrows/arr072.svg" />
-                    </span>
-                  </button>
-                  <Dropdown3></Dropdown3> -->
-                </div>
 
-                <Dropdown4></Dropdown4>
-                <Dropdown3></Dropdown3>
+                  <!-- <Dropdown3></Dropdown3>
+                  <Dropdown4></Dropdown4> -->
+                </div>
 
                 <a
                   v-show="!isFollowed"
+                  @click="followUserModalOpen = true"
                   class="btn btn-sm btn-primary me-3"
-                  data-bs-toggle="modal"
-                  :data-bs-target="`#followUserModal`"
                   >Follow</a
                 >
               </div>
-              <NewTradeModal v-if="isSelfProfile" />
-              <FollowUserModal :updating="isFollowed" v-if="!isSelfProfile" />
 
               <!--begin::Menu-->
               <!-- <div class="me-0">

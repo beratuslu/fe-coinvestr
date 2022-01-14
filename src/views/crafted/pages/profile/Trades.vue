@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, ref, watch } from "vue";
+import { defineComponent, ref, watch, computed } from "vue";
 // import KTActivityItem1 from "@/layout/header/partials/activity-timeline/Item1.vue";
 // import KTActivityItem2 from "@/layout/header/partials/activity-timeline/Item2.vue";
 // import KTActivityItem3 from "@/layout/header/partials/activity-timeline/Item3.vue";
@@ -10,6 +10,7 @@ import { defineComponent, ref, watch } from "vue";
 // import KTActivityItem8 from "@/layout/header/partials/activity-timeline/Item8.vue";
 import TradeList from "@/components/widgets/lists/TradeList.vue";
 import { useRoute, useRouter } from "vue-router";
+import { useStore } from "vuex";
 import ApiService from "@/core/services/ApiService";
 
 export default defineComponent({
@@ -27,15 +28,21 @@ export default defineComponent({
   },
   setup() {
     const route = useRoute();
+    const store = useStore();
     const activeTab = ref(route.name);
     const loading = ref(true);
     const trades = ref([]);
+
+    const currentProfile = computed(() => {
+      return store.getters.currentProfile;
+    });
 
     const getData = () => {
       loading.value = true;
       ApiService.post(`api/v1/profile/user-trades`, {
         recordType: activeTab.value,
         pagination: { pageSize: 10, pageNumber: 1 },
+        userId: currentProfile.value.id,
       })
         .then(({ data }) => {
           trades.value = data.map((trade) => {
@@ -73,6 +80,7 @@ export default defineComponent({
     return {
       activeTab,
       trades,
+      currentProfile,
     };
   },
 });
@@ -103,7 +111,7 @@ export default defineComponent({
           <li class="nav-item" role="presentation">
             <router-link
               class="nav-link justify-content-center text-active-gray-800"
-              :to="`/profile/beratuslu/trades/my-trades`"
+              :to="`/profile/${currentProfile.userName}/trades/my-trades`"
               :class="{ active: activeTab == 'myTrades' }"
             >
               My Trades
@@ -112,7 +120,7 @@ export default defineComponent({
           <li class="nav-item" role="presentation">
             <router-link
               class="nav-link justify-content-center text-active-gray-800"
-              :to="`/profile/beratuslu/trades/copied-trades`"
+              :to="`/profile/${currentProfile.userName}/trades/copied-trades`"
               :class="{ active: activeTab == 'copiedTrades' }"
             >
               Copied Trades

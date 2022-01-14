@@ -30,7 +30,7 @@ export default class AuthModule extends VuexModule implements UserAuthInfo {
    * Get current user object
    * @returns User
    */
-  get currentUser(): User {
+  get authenticatedUser(): User {
     return this.user;
   }
 

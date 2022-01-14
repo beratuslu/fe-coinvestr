@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, ref, computed } from "vue";
+import { defineComponent, ref, computed, inject, watch } from "vue";
 import { Form, ErrorMessage, Field } from "vee-validate";
 import { hideModal } from "@/core/helpers/dom";
 import Swal from "sweetalert2/dist/sweetalert2.js";
@@ -17,9 +17,12 @@ export default defineComponent({
   },
   props: {
     updating: Boolean,
+    showModal: Boolean,
+    modalOpened: Boolean,
   },
   setup(props) {
     const store = useStore();
+    const $vfm = inject("$vfm");
     const formRef = ref(null);
     const followUserModalRef = ref(null);
     const loading = ref(false);
@@ -43,19 +46,22 @@ export default defineComponent({
     function onSubmit(values) {
       loading.value = true;
 
-      console.log(
-        "🚀 ~ file: FollowUserModal.vue ~ line 42 ~ onSubmit ~ currentProfile",
-        currentProfile.value.id
-      );
       const postData = {
         traderId: currentProfile.value.id,
         ...formData.value,
+        updating: props.updating,
       };
       ApiService.post(`api/v1/profile/follow`, postData)
         .then((response) => {
-          ElMessage.success(response.message || "You are following this user!");
-          hideModal(followUserModalRef.value);
-          formRef.value.resetForm();
+          ElMessage.success(
+            response.message || props.updating
+              ? "Amount updated!"
+              : "You are following this user!"
+          );
+          closeModal();
+          if (!props.updating) {
+            formRef.value.resetForm();
+          }
           store.dispatch(Actions.GET_PROFILE, currentProfile.value.userName);
         })
         .catch((err) => {
@@ -65,7 +71,24 @@ export default defineComponent({
           loading.value = false;
         });
     }
+    const getFollowAmount = () => {
+      const postData = {
+        userId: store.getters.authenticatedUser.id,
+        traderId: currentProfile.value.id,
+      };
 
+      ApiService.post(`api/v1/profile/get-follow-amount`, postData)
+        .then((response) => {
+          formData.value.amount = response.amount;
+        })
+        .catch((err) => {
+          console.log(err);
+          ElMessage.error(err.message || "Server error");
+        })
+        .finally(() => {
+          loading.value = false;
+        });
+    };
     function onInvalidSubmit() {
       console.log("in valid");
       // const submitBtn = document.querySelector(".submit-btn");
@@ -75,13 +98,24 @@ export default defineComponent({
       // }, 1000);
     }
 
-    return {
-      // symbol,
-      // buyPrice,
-      // profitPrice,
-      // stopLossPrice,
-      formData,
+    const closeModal = (params) => {
+      $vfm.hide("followUserModal").then(() => {
+        // do something on modal closed
+      });
+    };
 
+    watch(
+      () => props.updating,
+      (current, prev) => {
+        if (current) {
+          getFollowAmount();
+        }
+      }
+    );
+
+    return {
+      formData,
+      closeModal,
       formRef,
       loading,
       followUserModalRef,
@@ -96,8 +130,9 @@ export default defineComponent({
 
 <template>
   <div
-    class="modal fade"
-    id="followUserModal"
+    class="modal fade pe-none"
+    style="display: block"
+    :class="{ show: modalOpened }"
     ref="followUserModalRef"
     tabindex="-1"
     aria-hidden="true"
@@ -108,6 +143,7 @@ export default defineComponent({
           <h2 class="fw-bolder">Enter Copy Amount</h2>
 
           <div
+            @click="closeModal"
             id="kt_modal_add_customer_close"
             data-bs-dismiss="modal"
             class="btn btn-icon btn-sm btn-active-icon-primary"
@@ -169,6 +205,7 @@ export default defineComponent({
               :data-kt-indicator="loading ? 'on' : null"
               class="btn btn-lg btn-primary"
               type="submit"
+              :disabled="loading"
             >
               <span v-if="!loading" class="indicator-label">
                 Submit
@@ -189,3 +226,9 @@ export default defineComponent({
     </div>
   </div>
 </template>
+
+<style>
+.vfm--overlay {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+}
+</style>

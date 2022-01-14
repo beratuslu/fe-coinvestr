@@ -15,6 +15,7 @@ import ApiService from "@/core/services/ApiService";
 import { initApexCharts } from "@/core/plugins/apexcharts";
 import { initInlineSvg } from "@/core/plugins/inline-svg";
 import { initVeeValidate } from "@/core/plugins/vee-validate";
+import vfmPlugin from "vue-final-modal";
 
 import "@/core/plugins/keenthemes";
 import "@/core/plugins/prismjs";
@@ -26,6 +27,7 @@ app.provide("moment", moment);
 app.use(store);
 app.use(router);
 app.use(ElementPlus);
+app.use(vfmPlugin);
 
 ApiService.init(app);
 initApexCharts(app);

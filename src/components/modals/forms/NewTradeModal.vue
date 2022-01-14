@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, inject } from "vue";
 import { Form, ErrorMessage, Field } from "vee-validate";
 import { hideModal } from "@/core/helpers/dom";
 import Swal from "sweetalert2/dist/sweetalert2.js";
@@ -9,14 +9,20 @@ import { ElMessage } from "element-plus";
 
 export default defineComponent({
   name: "CreateTradeModal",
+
+  props: {
+    showModal: Boolean,
+    modalOpened: Boolean,
+  },
   components: {
     Form,
     Field,
   },
-  setup() {
+  setup(props) {
     const formRef = ref(null);
     const newTradeModalRef = ref(null);
     const loading = ref(false);
+    const $vfm = inject("$vfm");
 
     const initialFormData = {
       symbol: "ETHBTC",
@@ -29,6 +35,11 @@ export default defineComponent({
 
     const resetFormData = () => {
       formData.value = initialFormData;
+    };
+    const closeModal = (params) => {
+      $vfm.hide("newTradeModal").then(() => {
+        // do something on modal closed
+      });
     };
 
     const getSymbols = () => {
@@ -78,6 +89,7 @@ export default defineComponent({
           ElMessage.success(response.message || "Trade created successfully!");
           hideModal(newTradeModalRef.value);
           formRef.value.resetForm();
+          closeModal();
         })
         .catch((err) => {
           ElMessage.error(err.message || "Server error");
@@ -89,18 +101,9 @@ export default defineComponent({
 
     function onInvalidSubmit() {
       console.log("in valid");
-      // const submitBtn = document.querySelector(".submit-btn");
-      // submitBtn.classList.add("invalid");
-      // setTimeout(() => {
-      //   submitBtn.classList.remove("invalid");
-      // }, 1000);
     }
 
     return {
-      // symbol,
-      // buyPrice,
-      // profitPrice,
-      // stopLossPrice,
       formData,
 
       formRef,
@@ -110,6 +113,7 @@ export default defineComponent({
       validationSchema,
       onSubmit,
       onInvalidSubmit,
+      closeModal,
     };
   },
 });
@@ -117,9 +121,9 @@ export default defineComponent({
 
 <template>
   <div
-    class="modal fade"
-    id="newTradeModal"
-    ref="newTradeModalRef"
+    class="modal fade pe-none"
+    :class="{ show: modalOpened }"
+    style="display: block"
     tabindex="-1"
     aria-hidden="true"
   >
@@ -129,6 +133,7 @@ export default defineComponent({
           <h2 class="fw-bolder">New Trade</h2>
 
           <div
+            @click="closeModal"
             id="kt_modal_add_customer_close"
             data-bs-dismiss="modal"
             class="btn btn-icon btn-sm btn-active-icon-primary"
@@ -241,6 +246,7 @@ export default defineComponent({
               :data-kt-indicator="loading ? 'on' : null"
               class="btn btn-lg btn-primary"
               type="submit"
+              :disabled="loading"
             >
               <span v-if="!loading" class="indicator-label">
                 Submit
@@ -261,3 +267,9 @@ export default defineComponent({
     </div>
   </div>
 </template>
+
+<style>
+.vfm--overlay {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+}
+</style>

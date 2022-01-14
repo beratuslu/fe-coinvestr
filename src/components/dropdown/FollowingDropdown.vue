@@ -5,20 +5,20 @@ import ApiService from "@/core/services/ApiService";
 import { ElMessage } from "element-plus";
 import { Actions } from "@/store/enums/StoreEnums";
 import { useStore } from "vuex";
-export default defineComponent({
+export default {
   name: "FollowingDropdown",
   // props: {
   //   isFollowed: Boolean,
   // },
   components: {
-    FollowUserModal,
+    // FollowUserModal,
   },
   setup(props) {
     const store = useStore();
     const loading = ref(false);
     const isFollowed = computed(() => {
       let arr = store.getters.currentProfile.followers.filter(
-        (user) => user.id === store.getters.currentUser.id
+        (user) => user.id === store.getters.authenticatedUser.id
       );
 
       let isFollowed = false;
@@ -53,11 +53,9 @@ export default defineComponent({
 
     return { isFollowed, unfollow };
   },
-});
+};
 </script>
-
 <template>
-  <!--begin::Menu-->
   <div
     class="
       menu
@@ -68,32 +66,19 @@ export default defineComponent({
       menu-gray-800
       menu-state-bg-light-primary
       fw-bold
-      py-2
       w-125px
+      py-2
       fs-6
     "
     data-kt-menu="true"
   >
-    <!--begin::Menu item-->
     <div class="menu-item px-2 my-1">
-      <!-- <a href="#" class="menu-link px-5 fs-7"> Edit Copy </a> -->
-      <a
-        class="menu-link px-5 fs-7"
-        data-bs-toggle="modal"
-        :data-bs-target="`#followUserModal`"
-        >Edit Copy</a
-      >
-      <FollowUserModal :updating="isFollowed" />
-    </div>
-    <!--end::Menu item-->
-
-    <!--begin::Menu item-->
-    <div class="menu-item px-2">
-      <a @click="unfollow" class="menu-link text-danger fs-7 px-5">
-        Unfollow
+      <a @click="$vfm.show('followUserModal')" class="menu-link px-5 fs-7">
+        Edit Copy
       </a>
     </div>
-    <!--end::Menu item-->
+    <div class="menu-item px-2 my-1 fs-7">
+      <a @click="unfollow" class="menu-link px-5 text-danger"> Unfollow </a>
+    </div>
   </div>
-  <!--end::Menu-->
 </template>

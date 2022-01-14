@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, computed, ref, watch } from "vue";
+import { defineComponent, computed, ref, watch, inject } from "vue";
 import ConnectionCard from "@/components/cards/ConnectionCard.vue";
 import { setCurrentPageBreadcrumbs } from "@/core/helpers/breadcrumb";
 import { useRoute, useRouter } from "vue-router";
@@ -19,6 +19,9 @@ export default defineComponent({
     const connectionType = ref(route.name);
     const userName = ref(route.params.userName);
     const store = useStore();
+    const $vfm = inject("$vfm");
+    const modalOpen = ref(false);
+    const modalOpened = ref(false);
 
     const getData = () => {
       loading.value = true;
@@ -39,6 +42,14 @@ export default defineComponent({
         });
     };
     // getData();
+    const openModal = (params) => {
+      console.log("open midaksss");
+      // modalOpen.value = true;
+      $vfm.show("example", { userName: "vue-final-modal" }).then(() => {
+        console.log("asdasdasdddddd");
+        // modalOpened.value = true;
+      });
+    };
 
     const connectionList = computed(() => {
       return store.getters.currentProfile[connectionType.value];
@@ -57,6 +68,9 @@ export default defineComponent({
       connectionList,
       connectionType,
       loading,
+      openModal,
+      modalOpen,
+      modalOpened,
     };
   },
 });
@@ -89,6 +103,7 @@ export default defineComponent({
   <!--end::Followers toolbar-->
 
   <!--begin::Row-->
+
   <div class="row g-6 mb-6 g-xl-9 mb-xl-9">
     <!--begin::Followers-->
 
@@ -116,3 +131,59 @@ export default defineComponent({
   </div>
   <!--end::Row-->
 </template>
+
+<style>
+.vfm-enter-active1,
+.vfm-leave-active1 {
+  transition: opacity 3s;
+}
+.vfm-enter1,
+.vfm-leave-to1 {
+  opacity: 0;
+}
+
+/* .modal123 {
+  height: 150px;
+  width: 1px;
+  opacity: 0;
+  transition: all 0.75s ease;
+}
+
+.modal123.show {
+  opacity: 1;
+  height: 150px;
+  width: 500px;
+} */
+/* .modal-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  position: relative;
+  max-width: 650px;
+  min-width: 650px;
+  margin: 0;
+  max-height: 300px;
+  padding: 16px;
+  overflow: auto;
+  background-color: #fff;
+  border-radius: 4px;
+}
+.modal-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  margin: 8px 8px 0 0;
+  cursor: pointer;
+}
+.modal-close::hover {
+  color: gray;
+} */
+</style>
+
