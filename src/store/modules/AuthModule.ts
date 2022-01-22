@@ -85,6 +85,14 @@ export default class AuthModule extends VuexModule implements UserAuthInfo {
     ApiService.removeHeader();
     // const router = useRouter();
     router.push({ name: "sign-in" });
+    setTimeout(() => {
+      // window.location.href = "#/sign-in";
+      console.log(
+        "🚀 ~ file: AuthModule.ts ~ line 90 ~ AuthModule ~ setTimeout ~ window.location.href",
+        window.location.href
+      );
+      window.location.reload();
+    }, 200);
 
     // ApiService.vueInstance.$router.push({ name: "sign-in" });
     // App.$router.push({ name: "sign-in" });
@@ -96,6 +104,9 @@ export default class AuthModule extends VuexModule implements UserAuthInfo {
       ApiService.post("auth/login", credentials)
         .then((response) => {
           this.context.commit(Mutations.SET_AUTH, response.data);
+
+          this.context.dispatch(Actions.GET_ENUMS_AND_CONSTANTS);
+          this.context.dispatch(Actions.CONNECT_SOCKET);
           resolve();
         })
         .catch((error) => {
@@ -112,6 +123,7 @@ export default class AuthModule extends VuexModule implements UserAuthInfo {
   @Action
   [Actions.LOGOUT]() {
     this.context.commit(Mutations.PURGE_AUTH);
+    this.context.dispatch(Actions.DISCONNECT_SOCKET);
   }
 
   @Action

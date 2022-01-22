@@ -1,16 +1,11 @@
 <template>
-  <!--begin::Toolbar wrapper-->
   <div class="d-flex align-items-stretch flex-shrink-0">
     <div class="topbar d-flex align-items-stretch flex-shrink-0">
-      <!--begin::Search-->
-      <div class="d-flex align-items-stretch ms-1 ms-lg-3">
+      <!-- <div class="d-flex align-items-stretch ms-1 ms-lg-3">
         <KTSearch></KTSearch>
-      </div>
-      <!--end::Search-->
-
-      <!--begin::Activities-->
+      </div> -->
+      <!-- 
       <div class="d-flex align-items-center ms-1 ms-lg-3">
-        <!--begin::drawer toggle-->
         <div
           class="
             btn btn-icon btn-active-light-primary
@@ -25,13 +20,9 @@
             <inline-svg src="media/icons/duotune/general/gen032.svg" />
           </span>
         </div>
-        <!--end::drawer toggle-->
       </div>
-      <!--end::Activities-->
 
-      <!--begin::Quick links-->
       <div class="d-flex align-items-center ms-1 ms-lg-3">
-        <!--begin::Menu-->
         <div
           class="
             btn btn-icon btn-active-light-primary
@@ -50,13 +41,9 @@
           </span>
         </div>
         <KTQuickLinksMenu></KTQuickLinksMenu>
-        <!--end::Menu-->
       </div>
-      <!--end::Quick links-->
 
-      <!--begin::Chat-->
       <div class="d-flex align-items-center ms-1 ms-lg-3">
-        <!--begin::Menu wrapper-->
         <div
           class="
             btn btn-icon btn-active-light-primary
@@ -87,13 +74,9 @@
           >
           </span>
         </div>
-        <!--end::Menu wrapper-->
       </div>
-      <!--end::Chat-->
 
-      <!--begin::Notifications-->
       <div class="d-flex align-items-center ms-1 ms-lg-3">
-        <!--begin::Menu-->
         <div
           class="
             btn btn-icon btn-active-light-primary
@@ -113,16 +96,16 @@
           </span>
         </div>
         <KTNotificationsMenu></KTNotificationsMenu>
-        <!--end::Menu-->
-      </div>
-      <!--end::Notifications-->
+      </div> -->
 
-      <!--begin::User-->
+      <div class="d-flex align-items-stretch ms-1 ms-lg-3">
+        <NotificationsMenu1 />
+      </div>
+
       <div
         class="d-flex align-items-center me-n3 ms-1 ms-lg-3"
         id="kt_header_user_menu_toggle"
       >
-        <!--begin::Menu-->
         <div
           class="
             btn btn-icon btn-active-light-primary
@@ -143,28 +126,27 @@
           />
         </div>
         <KTUserMenu></KTUserMenu>
-        <!--end::Menu-->
       </div>
-      <!--end::User -->
     </div>
   </div>
-  <!--end::Toolbar wrapper-->
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import KTSearch from "@/layout/header/partials/Search.vue";
 import KTNotificationsMenu from "@/layout/header/partials/NotificationsMenu.vue";
+import NotificationsMenu1 from "@/layout/header/partials/NotificationsMenu1.vue";
 import KTQuickLinksMenu from "@/layout/header/partials/QuickLinksMenu.vue";
 import KTUserMenu from "@/layout/header/partials/UserMenu.vue";
 
 export default defineComponent({
   name: "topbar",
   components: {
-    KTNotificationsMenu,
-    KTQuickLinksMenu,
+    // KTNotificationsMenu,
+    // KTQuickLinksMenu,
     KTUserMenu,
-    KTSearch,
+    // KTSearch,
+    NotificationsMenu1,
   },
 });
 </script>

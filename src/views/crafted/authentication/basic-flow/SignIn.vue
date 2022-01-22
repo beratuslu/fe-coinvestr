@@ -147,7 +147,7 @@ export default defineComponent({
     //Form submit function
     const onSubmitLogin = (values) => {
       // Clear existing errors
-      store.dispatch(Actions.LOGOUT);
+      // store.dispatch(Actions.LOGOUT);
 
       if (submitButton.value) {
         // eslint-disable-next-line

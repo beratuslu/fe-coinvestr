@@ -33,8 +33,7 @@
 <script lang="ts">
 import { defineComponent, onMounted } from "vue";
 import { useStore } from "vuex";
-import { Mutations } from "@/store/enums/StoreEnums";
-
+import { Actions, Mutations } from "@/store/enums/StoreEnums";
 import ApiService from "@/core/services/ApiService";
 
 export default defineComponent({
@@ -49,6 +48,10 @@ export default defineComponent({
        */
       store.commit(Mutations.OVERRIDE_LAYOUT_CONFIG);
       ApiService.setHeaderAndUser();
+      if (store.getters.isUserAuthenticated) {
+        store.dispatch(Actions.GET_ENUMS_AND_CONSTANTS);
+        store.dispatch(Actions.CONNECT_SOCKET);
+      }
     });
   },
 });

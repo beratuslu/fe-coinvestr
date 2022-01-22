@@ -3,8 +3,10 @@ import axios from "axios";
 import VueAxios from "vue-axios";
 import JwtService from "@/core/services/JwtService";
 import store from "@/store";
-import { Mutations } from "@/store/enums/StoreEnums";
+
 import { AxiosResponse, AxiosRequestConfig } from "axios";
+import { Actions, Mutations } from "@/store/enums/StoreEnums";
+import app from "@/main";
 const BASE_URL = process.env.VUE_APP_API_BASE_URL;
 
 axios.interceptors.response.use(function (response) {
