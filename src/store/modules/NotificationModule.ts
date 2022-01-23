@@ -1,16 +1,8 @@
 import { h } from "vue";
-
-import { ElMessage, ElNotification } from "element-plus";
-import Vue from "vue";
 import { Actions, Mutations } from "@/store/enums/StoreEnums";
 import ApiService from "@/core/services/ApiService";
-
 import { pusher } from "./pusher";
 import NotifMessages from "@/layout/header/partials/NotifMessages/";
-
-// import { default as app } from "../../main";
-// import app from "../../main";
-// console.log("🚀 ~ file: NotificationModule.ts ~ line 13 ~ app", App);
 
 const state = {
   notifications: [],
@@ -28,66 +20,47 @@ const actions = {
       const channel = pusher.subscribe(
         `private-user-${context.getters.authenticatedUser.id}`
       );
-
-      console.log(
-        "🚀 ~ file: NotificationModule.ts ~ line 70 ~ returnnewPromise ~ Vue",
-        Vue
-      );
-
       channel.bind("notification", (data) => {
         context.commit(Mutations.ADD_NOTIFICATION, data);
+        console.log(
+          "🚀 ~ file: NotificationModule.ts ~ line 25 ~ channel.bind ~ data",
+          data
+        );
+        console.log(
+          "🚀 ~ file: NotificationModule.ts ~ line 30 ~ channel.bind ~ ApiService.vueInstance",
+          ApiService.vueInstance
+        );
 
-        ApiService.vueInstance.config.globalProperties.$notify.success({
-          title: "Info",
-          message: "This is a message without close button",
-          // message: h(NotifMessages["INSUFFICIENT_BALANCE_FOR_SOCKET_CHECK"], {
-          //   notification: data,
-          //   store: context.store,
-          // }),
+        const { title, status } =
+          context.getters.enumsAndConstants.notifications[data.notifType];
+
+        ApiService.vueInstance.config.globalProperties.$notify[status]({
+          title,
+          // message: "This is a message without close button",
+          message: h(NotifMessages[data.notifType], {
+            notification: data,
+            store: context,
+            router: ApiService.vueInstance.config.globalProperties.$router,
+          }),
           showClose: true,
           position: "bottom-left",
+          // duration: 5000,
+          duration: 0,
         });
-
-        // app.$notify.success({
-        //   title: "Info",
-        //   message: "This is a message without close button",
-        //   // message: h(NotifMessages["INSUFFICIENT_BALANCE_FOR_SOCKET_CHECK"], {
-        //   //   notification: data,
-        //   //   store: context.store,
-        //   // }),
-        //   showClose: true,
-        //   position: "bottom-left",
-        // });
-
-        // ElNotification.success({
-        //   title: "Info",
-        //   // message: "This is a message without close button",
-        //   message: h(NotifMessages["INSUFFICIENT_BALANCE_FOR_SOCKET_CHECK"], {
-        //     notification: data,
-        //     store: context.store,
-        //   }),
-        //   showClose: true,
-        //   position: "bottom-left",
-        // });
       });
+      resolve("connected");
     });
   },
+  [Actions.SET_NOTIFICATION_AS_READ](context, notifId) {
+    return new Promise((resolve) => {
+      console.log(
+        "🚀 ~ file: NotificationModule.ts ~ line 45 ~ notifId",
+        notifId
+      );
 
-  // [Actions.GET_NOTIFICATIONS](context, userName) {
-  //   return new Promise((resolve) => {
-  //     ApiService.post(`api/v1/notifications`, {
-  //       pagination: { pageSize: 45, pageNumber: 1 },
-  //     })
-  //       .then((response) => {
-  //         context.commit(Mutations.SET_PROFILE, response.data);
-  //         resolve(response.data);
-  //       })
-  //       .catch((err) => {
-  //         ElMessage.error(err.message || "Server error");
-  //         // context.commit(SET_ERROR, response.data.errors);
-  //       });
-  //   });
-  // },
+      resolve("connected");
+    });
+  },
 };
 
 const mutations = {

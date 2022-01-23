@@ -60,6 +60,11 @@ export default {
     watch(
       () => route.path,
       (current, prev) => {
+        console.log("🚀 ~ file: Profile1.vue ~ line 63 ~ setup ~ prev", prev);
+        console.log(
+          "🚀 ~ file: Profile1.vue ~ line 63 ~ setup ~ current",
+          current
+        );
         userName.value = route.params.userName;
         activeTab.value = route.name;
 

@@ -1,0 +1,18 @@
+.el-notification .el-icon-success {
+  color: var(--el-color-success);
+}
+
+.el-notification .el-icon-info {
+  color: var(--el-color-primary);
+}
+
+.el-notification .el-icon-warning {
+  color: var(--el-color-warning);
+}
+
+.el-notification .el-icon-error {
+  color: var(--el-color-error);
+}
+.el-notification__content {
+  text-align: initial;
+}

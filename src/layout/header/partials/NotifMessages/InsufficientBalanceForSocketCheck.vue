@@ -1,39 +1,37 @@
 <template>
-  <div @mouseenter="alert1">{{ notifText }}</div>
+  <div class="w-100" @mouseenter="setNotifAsRead(notification.id)">
+    {{ notifText }}
+  </div>
 </template>
 
 <script>
-import { defineComponent, ref, computed, inject, watch } from "vue";
-import { useStore } from "vuex";
+import { computed } from "vue";
+import { Actions } from "@/store/enums/StoreEnums";
+
 export default {
   name: "Notif",
   props: {
     notification: Object,
     store: Object,
+    router: Object,
   },
   components: {
     // Results,
-    // Main,
-    // Empty,
-    // MenuComponent,
   },
   setup(props) {
-    // const loading = ref(false);
-    // const notifications = ref([]);
+    const setNotifAsRead = (notifId) => {
+      props.store.dispatch(Actions.SET_NOTIFICATION_AS_READ, notifId);
+    };
 
     const notifText = computed(() => {
-      // return "asd";
       return props.store.getters.enumsAndConstants.notifications[
         props.notification.notifType
-      ];
+      ].body;
     });
 
-    const alert1 = () => {
-      alert("------------1");
-    };
     return {
-      alert1,
       notifText,
+      setNotifAsRead,
     };
   },
 };
