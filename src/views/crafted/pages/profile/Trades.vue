@@ -38,8 +38,22 @@ export default defineComponent({
     const currentProfile = computed(() => {
       return store.getters.currentProfile;
     });
+    const parseData = (data) => {
+      trades.value = data.map((trade) => {
+        const tradeToReturn = trade;
+        const { helpDeskRequestUrl } = trade;
+        if (trade.errored) {
+          tradeToReturn.activities.push({
+            helpDeskRequestUrl,
+            type: "error",
+          });
+        }
 
-    const getData = () => {
+        return tradeToReturn;
+      });
+    };
+
+    const getTrades = () => {
       loading.value = true;
       ApiService.post(`api/v1/profile/user-trades`, {
         recordType: activeTab.value,
@@ -47,18 +61,7 @@ export default defineComponent({
         userId: currentProfile.value.id,
       })
         .then(({ data }) => {
-          trades.value = data.map((trade) => {
-            const tradeToReturn = trade;
-            const { helpDeskRequestUrl } = trade;
-            if (trade.errored) {
-              tradeToReturn.activities.push({
-                helpDeskRequestUrl,
-                type: "error",
-              });
-            }
-
-            return tradeToReturn;
-          });
+          parseData(data);
         })
         .catch(() => {
           console.log("error");
@@ -67,7 +70,24 @@ export default defineComponent({
           loading.value = false;
         });
     };
-    getData();
+    const getSingleTrade = () => {
+      loading.value = true;
+      ApiService.get(`api/v1/trades/single-trade/${route.params.copyTradeId}`)
+        .then(({ data }) => {
+          parseData(data);
+        })
+        .catch(() => {
+          console.error("error");
+        })
+        .finally(() => {
+          loading.value = false;
+        });
+    };
+    if (activeTab.value == "singleTrade") {
+      getSingleTrade();
+    } else {
+      getTrades();
+    }
 
     const notifications = computed(() => {
       return store.getters.notifications;
@@ -82,7 +102,7 @@ export default defineComponent({
         activeTab.value = route.name;
         trades.value = [];
         if (route.path.includes("/trades/")) {
-          getData();
+          getTrades();
         }
       }
     );

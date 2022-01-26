@@ -159,7 +159,13 @@ export default {
             <h3 class="card-title align-items-start flex-column">
               <span class="fw-bolder mb-2 text-dark">Notifications</span>
             </h3>
-            <a @click.stop="setAllNotificationsAsRead" class="me-6"
+            <a
+              @click.stop="setAllNotificationsAsRead"
+              class="me-6"
+              :class="{
+                'text-secondary': !isThereUnreadNotification,
+                'cursor-pointer': isThereUnreadNotification,
+              }"
               >mark all as read</a
             >
           </div>

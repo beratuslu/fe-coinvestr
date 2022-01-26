@@ -59,6 +59,14 @@ const routes: Array<RouteRecordRaw> = [
                 name: "myTrades",
                 component: () =>
                   import("@/components/widgets/lists/TradeList.vue"),
+                children: [
+                  {
+                    path: ":copyTradeId",
+                    name: "singleTrade",
+                    component: () =>
+                      import("@/components/widgets/lists/TradeList.vue"),
+                  },
+                ],
               },
               {
                 path: "copied-trades",
