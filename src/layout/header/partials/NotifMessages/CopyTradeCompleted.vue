@@ -2,8 +2,13 @@
   <div class="w-100" @mouseenter="setNotifAsRead(notification.id)">
     <h6>{{ notifEnums[notification.notifType].title }}</h6>
     <a
-      :href="`/#copy-trade/${notification.params.copyTradeId}`"
-      @click="goTo(`/copy-trade/${notification.params.copyTradeId}`, $event)"
+      :href="`/#/profile/${currentUserName}/trades/my-trades/${notification.params.copyTradeId}`"
+      @click="
+        goTo(
+          `/profile/${currentUserName}/trades/my-trades/${notification.params.copyTradeId}`,
+          $event
+        )
+      "
       class="nav-link cursor-pointer d-inline px-0"
       >copy trade</a
     >
@@ -31,6 +36,9 @@ export default {
         props.store.dispatch(Actions.SET_NOTIFICATION_AS_READ, notifId);
       }
     };
+    const currentUserName = computed(() => {
+      return props.store.getters.authenticatedUser.userName;
+    });
     const goTo = (url, $event) => {
       $event.preventDefault();
       // eslint-disable-next-line vue/no-mutating-props
@@ -45,6 +53,7 @@ export default {
       setNotifAsRead,
       goTo,
       notifEnums,
+      currentUserName,
     };
   },
 };

@@ -61,6 +61,9 @@ export default {
         props.store.dispatch(Actions.SET_NOTIFICATION_AS_READ, notifId);
       }
     };
+    const currentUserName = computed(() => {
+      return props.store.getters.authenticatedUser.userName;
+    });
     const goTo = (url, $event) => {
       $event.preventDefault();
       // eslint-disable-next-line vue/no-mutating-props
@@ -79,6 +82,7 @@ export default {
       setNotifAsRead,
       goTo,
       notifEnums,
+      currentUserName,
       singleItem,
     };
   },
