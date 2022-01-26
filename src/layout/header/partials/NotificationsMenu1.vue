@@ -56,9 +56,16 @@ export default {
     const notifications = computed(() => {
       return store.getters.getNotifications;
     });
+    const isThereUnreadNotification = computed(() => {
+      return store.getters.isThereUnreadNotification;
+    });
 
     const setNotifAsRead = (notifId) => {
       store.dispatch(Actions.SET_NOTIFICATION_AS_READ, notifId);
+    };
+
+    const setAllNotificationsAsRead = (notifId) => {
+      store.dispatch(Actions.SET_ALL_NOTIFICATIONS_AS_READ, notifId);
     };
 
     // watch(
@@ -76,6 +83,8 @@ export default {
       store,
       router,
       setNotifAsRead,
+      isThereUnreadNotification,
+      setAllNotificationsAsRead,
     };
   },
 };
@@ -112,6 +121,7 @@ export default {
             </span>
 
             <span
+              v-if="isThereUnreadNotification"
               class="
                 bullet bullet-dot
                 bg-success
@@ -145,13 +155,18 @@ export default {
       >
         <!--begin::Wrapper-->
         <div>
-          <h3 class="card-title align-items-start flex-column">
-            <span class="fw-bolder mb-2 text-dark">Notifications</span>
-          </h3>
+          <div class="d-flex justify-content-between">
+            <h3 class="card-title align-items-start flex-column">
+              <span class="fw-bolder mb-2 text-dark">Notifications</span>
+            </h3>
+            <a @click.stop="setAllNotificationsAsRead" class="me-6"
+              >mark all as read</a
+            >
+          </div>
           <!--begin::Separator-->
           <div class="separator border-gray-200 mb-6"></div>
           <!--end::Separator-->
-          <div class="scroll-y mh-200px mh-lg-425px">
+          <div style="overflow-x: clip" class="scroll-y mh-300px mh-lg-425px">
             <!-- <Main></Main> -->
 
             <div

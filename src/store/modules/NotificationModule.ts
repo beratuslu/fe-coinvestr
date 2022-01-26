@@ -47,6 +47,13 @@ export default class BodyModule
   get getNotifications() {
     return this.notifications;
   }
+  get isThereUnreadNotification() {
+    const readNotifications = this.notifications.filter(
+      (notif) => !notif.isRead
+    );
+
+    return !!readNotifications.length;
+  }
   @Action
   [Actions.CONNECT_PRIVATE_CHANNEL]() {
     return new Promise((resolve) => {
@@ -69,28 +76,57 @@ export default class BodyModule
           }),
           showClose: true,
           position: "bottom-left",
-          // duration: 5000,
-          duration: 0,
+          duration: 5000,
+          // duration: 0,
         });
       });
       resolve("connected");
     });
   }
   @Action
-  [Actions.GET_NOTIFICATIONS](context) {
+  [Actions.GET_NOTIFICATIONS]() {
     return new Promise((resolve) => {
       ApiService.post("api/v1/notifications", {
         pagination: { pageSize: 45, pageNumber: 1 },
       })
         .then((response) => {
-          // this.notifications = response.data;
-          context.commit(Mutations.SET_NOTIFICATIONS, response.data);
-          console.log(
-            "🚀 ~ file: NotificationModule.ts ~ line 95 ~ .then ~ response.data",
-            response.data
-          );
+          this.context.commit(Mutations.SET_NOTIFICATIONS, response.data);
+
           resolve("asdasd");
-          // notifications.value = response.data;
+        })
+        .catch(() => {
+          console.log("error");
+        })
+        .finally(() => {
+          // loading.value = false;
+        });
+    });
+  }
+  @Action
+  [Actions.SET_NOTIFICATION_AS_READ](notifId) {
+    return new Promise((resolve) => {
+      this.context.commit(Mutations.SET_SINGLE_NOTIFICATION_AS_READ, notifId);
+      ApiService.post("api/v1/notifications/mark-notifications-as-read", {
+        notifIdArr: [notifId],
+      })
+        .then((response) => {
+          resolve("asdasd");
+        })
+        .catch(() => {
+          console.log("error");
+        })
+        .finally(() => {
+          // loading.value = false;
+        });
+    });
+  }
+  @Action
+  [Actions.SET_ALL_NOTIFICATIONS_AS_READ](notifId) {
+    return new Promise((resolve) => {
+      this.context.commit(Mutations.SET_ALL_NOTIFICATIONS_AS_READ_MUTATION);
+      ApiService.post("api/v1/notifications/mark-all-notifications-as-read")
+        .then((response) => {
+          resolve("asdasd");
         })
         .catch(() => {
           console.log("error");
@@ -102,7 +138,7 @@ export default class BodyModule
   }
 
   @Mutation
-  [Mutations.SET_NOTIFICATION_AS_READ](notifId) {
+  [Mutations.SET_SINGLE_NOTIFICATION_AS_READ](notifId) {
     const index = this.notifications.findIndex(
       (item) => item["id"] === notifId
     );
@@ -111,5 +147,18 @@ export default class BodyModule
   @Mutation
   [Mutations.SET_NOTIFICATIONS](arr) {
     this.notifications = arr;
+  }
+  @Mutation
+  [Mutations.ADD_NOTIFICATION](notif) {
+    this.notifications.unshift(notif);
+  }
+  @Mutation
+  [Mutations.SET_ALL_NOTIFICATIONS_AS_READ_MUTATION]() {
+    this.notifications = this.notifications.map((notif) => {
+      return {
+        ...notif,
+        isRead: true,
+      };
+    });
   }
 }

@@ -14,7 +14,9 @@ export default {
   },
   setup(props) {
     const setNotifAsRead = (notifId) => {
-      props.store.commit(Mutations.SET_NOTIFICATION_AS_READ, notifId);
+      if (!props.notification.isRead) {
+        props.store.dispatch(Actions.SET_NOTIFICATION_AS_READ, notifId);
+      }
     };
     const goTo = (url, $event) => {
       $event.preventDefault();

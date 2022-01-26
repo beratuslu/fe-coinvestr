@@ -1,7 +1,5 @@
 <template>
   <div class="w-100" @mouseenter="setNotifAsRead(notification.id)">
-    {{ singleItem }}
-    <h6>{{ notification.isRead }}</h6>
     <h6>{{ notifEnums[notification.notifType].title }}</h6>
     New trade copied from Copy trade failed due to
     <span class="fw-bolder">{{ notification.params.reason }}</span>
@@ -59,7 +57,9 @@ export default {
   },
   setup(props) {
     const setNotifAsRead = (notifId) => {
-      props.store.commit(Mutations.SET_NOTIFICATION_AS_READ, notifId);
+      if (!props.notification.isRead) {
+        props.store.dispatch(Actions.SET_NOTIFICATION_AS_READ, notifId);
+      }
     };
     const goTo = (url, $event) => {
       $event.preventDefault();
