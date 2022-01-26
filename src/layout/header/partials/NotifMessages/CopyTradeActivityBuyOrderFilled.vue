@@ -3,8 +3,13 @@
     <h6>{{ notifEnums[notification.notifType].title }}</h6>
     Buy order filled of
     <a
-      :href="`/#copy-trade/${notification.params.copyTradeId}`"
-      @click="goTo(`/copy-trade/${notification.params.copyTradeId}`, $event)"
+      :href="`/#/profile/${currentUserName}/trades/my-trades/${notification.params.copyTradeId}`"
+      @click="
+        goTo(
+          `/profile/${currentUserName}/trades/my-trades/${notification.params.copyTradeId}`,
+          $event
+        )
+      "
       class="nav-link cursor-pointer d-inline px-0"
       >copy trade</a
     >.
@@ -47,8 +52,6 @@ export default {
     // RouterLink,
   },
   setup(props) {
-    const store = useStore();
-    const router = useRouter();
     const setNotifAsRead = (notifId) => {
       if (!props.notification.isRead) {
         props.store.dispatch(Actions.SET_NOTIFICATION_AS_READ, notifId);
@@ -60,6 +63,9 @@ export default {
       props.router.push(url);
     };
 
+    const currentUserName = computed(() => {
+      return props.store.getters.authenticatedUser.userName;
+    });
     const notifEnums = computed(() => {
       return props.store.getters.enumsAndConstants.notifications;
     });
@@ -68,6 +74,7 @@ export default {
       setNotifAsRead,
       goTo,
       notifEnums,
+      currentUserName,
     };
   },
 };

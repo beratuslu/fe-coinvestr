@@ -83,11 +83,15 @@ export default defineComponent({
           loading.value = false;
         });
     };
-    if (activeTab.value == "singleTrade") {
-      getSingleTrade();
-    } else {
-      getTrades();
-    }
+
+    const getData = () => {
+      if (activeTab.value == "singleTrade") {
+        getSingleTrade();
+      } else {
+        getTrades();
+      }
+    };
+    getData();
 
     const notifications = computed(() => {
       return store.getters.notifications;
@@ -102,7 +106,7 @@ export default defineComponent({
         activeTab.value = route.name;
         trades.value = [];
         if (route.path.includes("/trades/")) {
-          getTrades();
+          getData();
         }
       }
     );
