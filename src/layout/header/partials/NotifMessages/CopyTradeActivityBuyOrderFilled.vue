@@ -1,5 +1,6 @@
 <template>
   <div class="w-100" @mouseenter="setNotifAsRead(notification.id)">
+    <h6>{{ notifEnums[notification.notifType].title }}</h6>
     Buy order filled of
     <a
       :href="`/#copy-trade/${notification.params.copyTradeId}`"
@@ -31,7 +32,9 @@
 
 <script>
 import { computed } from "vue";
-import { Actions } from "@/store/enums/StoreEnums";
+import { Mutations } from "@/store/enums/StoreEnums";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
 export default {
   name: "Notif",
@@ -44,8 +47,10 @@ export default {
     // RouterLink,
   },
   setup(props) {
+    const store = useStore();
+    const router = useRouter();
     const setNotifAsRead = (notifId) => {
-      props.store.dispatch(Actions.SET_NOTIFICATION_AS_READ, notifId);
+      props.store.commit(Mutations.SET_NOTIFICATION_AS_READ, notifId);
     };
     const goTo = (url, $event) => {
       $event.preventDefault();
@@ -53,9 +58,14 @@ export default {
       props.router.push(url);
     };
 
+    const notifEnums = computed(() => {
+      return props.store.getters.enumsAndConstants.notifications;
+    });
+
     return {
       setNotifAsRead,
       goTo,
+      notifEnums,
     };
   },
 };

@@ -1,5 +1,8 @@
 <template>
   <div class="w-100" @mouseenter="setNotifAsRead(notification.id)">
+    {{ singleItem }}
+    <h6>{{ notification.isRead }}</h6>
+    <h6>{{ notifEnums[notification.notifType].title }}</h6>
     New trade copied from Copy trade failed due to
     <span class="fw-bolder">{{ notification.params.reason }}</span>
 
@@ -42,7 +45,7 @@
 
 <script>
 import { computed } from "vue";
-import { Actions } from "@/store/enums/StoreEnums";
+import { Actions, Mutations } from "@/store/enums/StoreEnums";
 
 export default {
   name: "Notif",
@@ -56,7 +59,7 @@ export default {
   },
   setup(props) {
     const setNotifAsRead = (notifId) => {
-      props.store.dispatch(Actions.SET_NOTIFICATION_AS_READ, notifId);
+      props.store.commit(Mutations.SET_NOTIFICATION_AS_READ, notifId);
     };
     const goTo = (url, $event) => {
       $event.preventDefault();
@@ -64,9 +67,19 @@ export default {
       props.router.push(url);
     };
 
+    const notifEnums = computed(() => {
+      return props.store.getters.enumsAndConstants.notifications;
+    });
+
+    const singleItem = computed(() => {
+      return props.store.getters.singleItem;
+    });
+
     return {
       setNotifAsRead,
       goTo,
+      notifEnums,
+      singleItem,
     };
   },
 };

@@ -12,6 +12,7 @@ import TradeList from "@/components/widgets/lists/TradeList.vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 import ApiService from "@/core/services/ApiService";
+import NotificationList from "@/layout/header/partials/NotificationList.vue";
 
 export default defineComponent({
   name: "Trades",
@@ -25,6 +26,7 @@ export default defineComponent({
     // KTActivityItem6,
     // KTActivityItem7,
     // KTActivityItem8,
+    // NotificationList,
   },
   setup() {
     const route = useRoute();
@@ -67,6 +69,13 @@ export default defineComponent({
     };
     getData();
 
+    const notifications = computed(() => {
+      return store.getters.notifications;
+    });
+    const singleItem = computed(() => {
+      return store.getters.singleItem;
+    });
+
     watch(
       () => route.path,
       (prev, current) => {
@@ -81,6 +90,8 @@ export default defineComponent({
       activeTab,
       trades,
       currentProfile,
+      notifications,
+      singleItem,
     };
   },
 });
@@ -134,6 +145,8 @@ export default defineComponent({
     <!--end::Card head-->
 
     <!--begin::Card body-->
+
+    <!-- <NotificationList></NotificationList> -->
     <router-view :list="trades"></router-view>
     <!--end::Card body-->
   </div>

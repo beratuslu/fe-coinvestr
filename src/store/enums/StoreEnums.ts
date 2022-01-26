@@ -28,7 +28,6 @@ enum Actions {
   // NotificationsModule
   CONNECT_PRIVATE_CHANNEL = "CONNECT_PRIVATE_CHANNEL",
   GET_NOTIFICATIONS = "GET_NOTIFICATIONS",
-  SET_NOTIFICATION_AS_READ = "SET_NOTIFICATION_AS_READ",
 }
 
 enum Mutations {
@@ -57,6 +56,8 @@ enum Mutations {
 
   // NotificationsModule
   ADD_NOTIFICATION = "ADD_NOTIFICATION",
+  SET_NOTIFICATION_AS_READ = "SET_NOTIFICATION_AS_READ",
+  SET_NOTIFICATIONS = "SET_NOTIFICATIONS",
 }
 
 export { Actions, Mutations };

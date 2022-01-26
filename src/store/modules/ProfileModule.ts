@@ -39,10 +39,6 @@ const getters = {
   currentUserAccountInfo1(state) {
     return state.user_account_info;
   },
-
-  currentUserPhoto1(state) {
-    return state.user_personal_info.photo;
-  },
 };
 
 const actions = {

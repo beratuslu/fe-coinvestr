@@ -51,6 +51,7 @@ export default defineComponent({
       if (store.getters.isUserAuthenticated) {
         store.dispatch(Actions.GET_ENUMS_AND_CONSTANTS);
         store.dispatch(Actions.CONNECT_SOCKET);
+        store.dispatch(Actions.GET_NOTIFICATIONS);
       }
     });
   },
