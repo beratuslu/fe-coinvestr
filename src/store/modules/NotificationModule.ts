@@ -139,10 +139,8 @@ export default class BodyModule
 
   @Mutation
   [Mutations.SET_SINGLE_NOTIFICATION_AS_READ](notifId) {
-    const index = this.notifications.findIndex(
-      (item) => item["id"] === notifId
-    );
-    this.notifications[index]["isRead"] = true;
+    const index = this.notifications.findIndex((item) => item.id === notifId);
+    this.notifications[index].isRead = true;
   }
   @Mutation
   [Mutations.SET_NOTIFICATIONS](arr) {
