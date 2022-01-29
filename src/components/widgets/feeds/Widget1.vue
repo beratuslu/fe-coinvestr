@@ -122,7 +122,7 @@ export default defineComponent({
       };
 
       // Init editor
-      new Quill("#" + editorId, options);
+      const quill = new Quill("#" + editorId, options);
     });
   },
 });

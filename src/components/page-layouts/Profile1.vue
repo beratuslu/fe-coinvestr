@@ -9,7 +9,16 @@ import NewTradeModal from "@/components/modals/forms/NewTradeModal.vue";
 import FollowUserModal from "@/components/modals/forms/FollowUserModal.vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
-import { Actions } from "@/store/enums/StoreEnums";
+import { Actions, Mutations } from "@/store/enums/StoreEnums";
+
+const cloudinaryOptions = {
+  cloudName: process.env.VUE_APP_CLOUDINARY_NAME,
+  uploadPreset: "photoUpload",
+  cropping: true,
+  showCompletedButton: true,
+  croppingAspectRatio: 4,
+  showPoweredBy: false,
+};
 
 export default {
   name: "Profile",
@@ -23,7 +32,6 @@ export default {
   setup() {
     const route = useRoute();
     const store = useStore();
-    const $vfm = inject("$vfm");
     const activeTab = ref(route.name);
     const loading = ref(false);
     const cloudinaryName = ref(process.env.VUE_APP_CLOUDINARY_NAME);
@@ -56,15 +64,75 @@ export default {
     const currentProfile = computed(() => {
       return store.getters.currentProfile;
     });
+    const openUploadWidget = (type) => {
+      cloudinaryOptions.uploadPreset = type;
+
+      if (type === "profilePhoto") {
+        cloudinaryOptions.croppingAspectRatio = 1;
+      }
+      if (type === "coverPhoto") {
+        cloudinaryOptions.croppingAspectRatio = 5;
+      }
+      window.cloudinary.openUploadWidget(
+        cloudinaryOptions,
+        async (error, photos) => {
+          const { event, info } = photos;
+          if (event === "success") {
+            ApiService.post(`api/v1/profile/update-profile-photo`, {
+              publicId: info.public_id,
+              type,
+            })
+              .then((response) => {
+                if (type === "coverPhoto") {
+                  // response.user
+                  // updateCoverPhotoSuccess(response.user);
+                  // localStorage.setItem("user", JSON.stringify(response.user));
+                }
+                if (type === "profilePhoto") {
+                  // updateProfilePhotoSuccess(response.user);
+                  // localStorage.setItem("user", JSON.stringify(response.user));
+
+                  if (isSelfProfile.value) {
+                    store.commit(
+                      Mutations.SET_PROFILE_PICTURE,
+                      response.user.profilePhoto
+                    );
+                  }
+                  store.dispatch(Actions.GET_PROFILE, userName.value);
+                }
+              })
+              .catch(() => {
+                console.log("error");
+              })
+              .finally(() => {
+                loading.value = false;
+              });
+
+            // try {
+            //   const response = await axios.post(
+            //     `${BASE_URL}/api/v1/profile/update-profile-photo`,
+            //     {
+            //       publicId: info.public_id,
+            //       type,
+            //     }
+            //   );
+            //   if (type === "coverPhoto") {
+            //     updateCoverPhotoSuccess(response.user);
+            //     localStorage.setItem("user", JSON.stringify(response.user));
+            //   }
+            //   if (type === "profilePhoto") {
+            //     updateProfilePhotoSuccess(response.user);
+            //     localStorage.setItem("user", JSON.stringify(response.user));
+            //   }
+            // } catch (error) {}
+          }
+        }
+      );
+    };
 
     watch(
       () => route.path,
       (current, prev) => {
-        console.log("🚀 ~ file: Profile1.vue ~ line 63 ~ setup ~ prev", prev);
-        console.log(
-          "🚀 ~ file: Profile1.vue ~ line 63 ~ setup ~ current",
-          current
-        );
         userName.value = route.params.userName;
         activeTab.value = route.name;
 
@@ -92,6 +160,7 @@ export default {
       newTradeModalOpen,
       followUserModalOpened,
       followUserModalOpen,
+      openUploadWidget,
     };
   },
 };
@@ -146,7 +215,7 @@ export default {
                 translate-middle
                 bottom-0
                 start-100
-                mb-6
+                mb-10
                 bg-success
                 rounded-circle
                 border border-4 border-white
@@ -154,6 +223,21 @@ export default {
                 w-20px
               "
             ></div>
+
+            <a
+              @click.stop="openUploadWidget('profilePhoto')"
+              style="right: -17px"
+              class="
+                btn btn-icon btn-bg-lightasdasd btn-active-color-primary btn-sm
+                position-absolute
+                bottom-0
+                btn-color-dark btn-active-light-primaryasdasd
+              "
+            >
+              <span class="svg-icon svg-icon-1">
+                <inline-svg src="media/icons/duotune/social/soc005.svg" />
+              </span>
+            </a>
           </div>
         </div>
         <!--end::Pic-->

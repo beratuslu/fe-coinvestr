@@ -1,11 +1,12 @@
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, computed } from "vue";
 import KTSearch from "@/layout/header/partials/Search.vue";
 import KTNotificationsMenu from "@/layout/header/partials/NotificationsMenu.vue";
 import NotificationsMenu1 from "@/layout/header/partials/NotificationsMenu1.vue";
 import KTQuickLinksMenu from "@/layout/header/partials/QuickLinksMenu.vue";
 import KTUserMenu from "@/layout/header/partials/UserMenu.vue";
 import NotificationList from "@/layout/header/partials/NotificationList.vue";
+import { useStore } from "vuex";
 
 export default defineComponent({
   name: "topbar",
@@ -18,30 +19,16 @@ export default defineComponent({
     // NotificationList,
   },
   setup() {
-    const gridData = ref([
-      {
-        date: "2016-05-02",
-        name: "Jack",
-        address: "New York City",
-      },
-      {
-        date: "2016-05-04",
-        name: "Jack",
-        address: "New York City",
-      },
-      {
-        date: "2016-05-01",
-        name: "Jack",
-        address: "New York City",
-      },
-      {
-        date: "2016-05-03",
-        name: "Jack",
-        address: "New York City",
-      },
-    ]);
+    const cloudinaryName = ref(process.env.VUE_APP_CLOUDINARY_NAME);
+    const store = useStore();
+
+    const authenticatedUser = computed(() => {
+      return store.getters.authenticatedUser;
+    });
+
     return {
-      gridData,
+      cloudinaryName,
+      authenticatedUser,
     };
   },
 });
@@ -189,9 +176,18 @@ export default defineComponent({
             w-md-40px
             h-md-40px
           "
+          data-kt-menu-trigger="click"
+          data-kt-menu-attach="parent"
+          data-kt-menu-placement="bottom-end"
+          data-kt-menu-flip="bottom"
         >
+          <!-- src="media/avatars/150-25.jpg" -->
           <img
-            src="media/avatars/150-25.jpg"
+            :src="
+              authenticatedUser.profilePhoto
+                ? `https://res.cloudinary.com/${cloudinaryName}/image/upload/w_300,h_300,c_fill,g_custom/${authenticatedUser.profilePhoto}.jpg`
+                : `media/avatars/blank.png`
+            "
             alt="metronic"
             class="h-25px w-25px rounded"
           />

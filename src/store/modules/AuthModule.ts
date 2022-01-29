@@ -11,6 +11,7 @@ export interface User {
   email: string;
   password: string;
   token: string;
+  profilePhoto: string;
 }
 
 export interface UserAuthInfo {
@@ -74,6 +75,11 @@ export default class AuthModule extends VuexModule implements UserAuthInfo {
   @Mutation
   [Mutations.SET_PASSWORD](password) {
     this.user.password = password;
+  }
+  @Mutation
+  [Mutations.SET_PROFILE_PICTURE](pictureKey) {
+    this.user.profilePhoto = pictureKey;
+    JwtService.saveUser(this.user);
   }
 
   @Mutation

@@ -1,3 +1,48 @@
+<script lang="ts">
+import { defineComponent, onMounted, computed } from "vue";
+import KTTopbar from "@/layout/header/Topbar.vue";
+import KTMenu from "@/layout/header/Menu.vue";
+import { StickyComponent } from "@/assets/ts/components";
+
+import {
+  headerWidthFluid,
+  headerFixed,
+  headerFixedOnMobile,
+  headerLeft,
+  asideDisplay,
+} from "@/core/helpers/config";
+
+export default defineComponent({
+  name: "KTHeader",
+  props: {
+    title: String,
+  },
+  components: {
+    KTTopbar,
+    KTMenu,
+  },
+  setup() {
+    onMounted(() => {
+      StickyComponent.reInitialization();
+    });
+
+    const isHeaderSticky = computed(() => {
+      if (window.innerWidth > 768) {
+        return headerFixed.value;
+      } else {
+        return headerFixedOnMobile.value;
+      }
+    });
+
+    return {
+      headerWidthFluid,
+      headerLeft,
+      asideDisplay,
+      isHeaderSticky,
+    };
+  },
+});
+</script>
 <template>
   <!--begin::Header-->
   <div
@@ -86,49 +131,3 @@
   </div>
   <!--end::Header-->
 </template>
-
-<script lang="ts">
-import { defineComponent, onMounted, computed } from "vue";
-import KTTopbar from "@/layout/header/Topbar.vue";
-import KTMenu from "@/layout/header/Menu.vue";
-import { StickyComponent } from "@/assets/ts/components";
-
-import {
-  headerWidthFluid,
-  headerFixed,
-  headerFixedOnMobile,
-  headerLeft,
-  asideDisplay,
-} from "@/core/helpers/config";
-
-export default defineComponent({
-  name: "KTHeader",
-  props: {
-    title: String,
-  },
-  components: {
-    KTTopbar,
-    KTMenu,
-  },
-  setup() {
-    onMounted(() => {
-      StickyComponent.reInitialization();
-    });
-
-    const isHeaderSticky = computed(() => {
-      if (window.innerWidth > 768) {
-        return headerFixed.value;
-      } else {
-        return headerFixedOnMobile.value;
-      }
-    });
-
-    return {
-      headerWidthFluid,
-      headerLeft,
-      asideDisplay,
-      isHeaderSticky,
-    };
-  },
-});
-</script>
