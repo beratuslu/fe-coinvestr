@@ -27,6 +27,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/profile/:userName",
         name: "profile1",
+        redirect: { name: "trades" },
         component: () => import("@/components/page-layouts/Profile1.vue"),
         children: [
           {

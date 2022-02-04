@@ -1,7 +1,16 @@
 <template>
   <div class="w-100" @mouseenter="setNotifAsRead(notification.id)">
     <h6>{{ notifEnums[notification.notifType].title }}</h6>
-    New trade copied from Copy trade failed due to
+    New trade copied from
+    <a
+      :href="`/#/profile/${notification.params.copiedUser.userName}`"
+      @click="
+        goTo(`/profile/${notification.params.copiedUser.userName}`, $event)
+      "
+      class="nav-link cursor-pointer d-inline px-0"
+      >{{ notification.params.copiedUser.userName }}</a
+    >
+    failed due to
     <span class="fw-bolder">{{ notification.params.reason }}</span>
 
     <table

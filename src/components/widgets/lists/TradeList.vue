@@ -1,6 +1,7 @@
 <script>
 import { defineComponent, ref } from "vue";
 import ApiService from "@/core/services/ApiService";
+import ticket from "@/components/widgets/ticket/ticket.vue";
 
 // import Dropdown2 from "@/components/dropdown/Dropdown2.vue";
 
@@ -8,7 +9,7 @@ export default defineComponent({
   name: "TradeList",
   inject: ["moment"],
   components: {
-    // Dropdown2,
+    ticket,
   },
   props: {
     widgetClasses: String,
@@ -78,112 +79,117 @@ export default defineComponent({
 
 <template>
   <!--begin::Body-->
-  <div class="card-body pt-5 overflow-auto">
+  <div class="card-body pt-5">
     <!--begin::Accordion-->
     <p v-if="!list.length">No trades.</p>
-    <div v-else style="min-width: 1154px" class="accordion" id="kt_accordion_1">
+    <div v-else class="accordion" id="kt_accordion_1">
       <div class="accordion-item" v-for="(item, index) in list" :key="item.id">
-        <h2
-          class="accordion-header d-flex"
-          :id="`kt_accordion_1_header_${item.id}`"
-        >
-          <button
-            class="accordion-button fs-4 fw-bold"
-            :class="{ collapsed: index != 0 }"
-            type="button"
-            data-bs-toggle="collapse"
-            :data-bs-target="`#kt_accordion_1_body_${item.id}`"
-            :aria-expanded="index == 0"
-            :aria-controls="`kt_accordion_1_header_${item.id}`"
+        <div class="overflow-auto">
+          <h2
+            style="min-width: 1200px"
+            class="accordion-header d-flex"
+            :id="`kt_accordion_1_header_${item.id}`"
           >
-            <!-- Accordion Item #{{ item.id }} -->
-
-            <!--begin::Item-->
-            <div
-              style="width: 200px"
-              class="d-flex align-items-center col-xxl-3"
+            <button
+              class="accordion-button fs-4 fw-bold"
+              :class="{ collapsed: index != 0 }"
+              type="button"
+              data-bs-toggle="collapse"
+              :data-bs-target="`#kt_accordion_1_body_${item.id}`"
+              :aria-expanded="index == 0"
+              :aria-controls="`kt_accordion_1_header_${item.id}`"
             >
-              <!--begin::Avatar-->
-              <router-link
-                :to="`/profile/${item.user.userName}/overview`"
-                class="text-dark fw-bolder text-hover-primary fs-6"
-              >
-                <div class="symbol symbol-50px me-5">
-                  <img
-                    :src="
-                      item.user.profilePhoto
-                        ? `https://res.cloudinary.com/${cloudinaryName}/image/upload/w_300,h_300,c_fill,g_custom/${item.user.profilePhoto}.jpg`
-                        : `media/avatars/blank.png`
-                    "
-                    alt=""
-                  />
-                </div>
-              </router-link>
-              <!--end::Avatar-->
+              <!-- Accordion Item #{{ item.id }} -->
 
-              <!--begin::Text-->
-              <div class="">
+              <!--begin::Item-->
+              <div
+                style="width: 200px"
+                class="d-flex align-items-center col-xxl-3"
+              >
+                <!--begin::Avatar-->
                 <router-link
                   :to="`/profile/${item.user.userName}/overview`"
-                  class="text-gray-700 fw-bolder text-hover-primary fs-6"
+                  class="text-dark fw-bolder text-hover-primary fs-6"
                 >
-                  <div class="">
-                    {{
-                      item.user.userName.length > 12
-                        ? `${item.user.userName.substring(0, 12)}...`
-                        : item.user.userName
-                    }}
+                  <div class="symbol symbol-50px me-5">
+                    <img
+                      :src="
+                        item.user.profilePhoto
+                          ? `https://res.cloudinary.com/${cloudinaryName}/image/upload/w_300,h_300,c_fill,g_custom/${item.user.profilePhoto}.jpg`
+                          : `media/avatars/blank.png`
+                      "
+                      alt=""
+                    />
                   </div>
                 </router-link>
+                <!--end::Avatar-->
 
-                <span class="text-muted d-block fw-bold">{{
-                  item.description
-                }}</span>
-              </div>
-              <!--end::Text-->
-            </div>
-            <div class="text-gray-700 w-150px fs-6">
-              {{ item.symbol.split("BTC")[0] }}_BTC
-            </div>
-            <div class="text-gray-700 w-150px fs-6">{{ item.buyPrice }}</div>
-            <div class="text-gray-700 w-150px fs-6">{{ item.profitPrice }}</div>
-            <div class="text-gray-700 w-150px fs-6">
-              {{ item.stopLossPrice }}
-            </div>
-            <div class="text-gray-700 w-150px fs-6">
-              {{ moment(item.createTime).format("YYYY-MM-DD HH:mm:ss.SSS") }}
-            </div>
-            <div class="w-250px d-flex align-items-center">
-              <div class="progress">
-                <div
-                  class="progress-bar bg-success"
-                  role="progressbar"
-                  :style="`width: ${item.status.profit}%`"
-                  :aria-valuenow="item.status.profit"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                ></div>
-                <div
-                  class="progress-bar bg-danger"
-                  role="progressbar"
-                  :style="`width: ${item.status.stopLoss}%`"
-                  :aria-valuenow="item.status.stopLoss"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                ></div>
-              </div>
-              <p class="text-gray-700 fs-7 mb-0 ms-4">
-                %{{
-                  (item.status.profit + item.status.stopLoss)
-                    .toFixed(2)
-                    .replace(/\.00$/, "")
-                }}
-              </p>
-            </div>
+                <!--begin::Text-->
+                <div class="">
+                  <router-link
+                    :to="`/profile/${item.user.userName}/overview`"
+                    class="text-gray-700 fw-bolder text-hover-primary fs-6"
+                  >
+                    <div class="">
+                      {{
+                        item.user.userName.length > 12
+                          ? `${item.user.userName.substring(0, 12)}...`
+                          : item.user.userName
+                      }}
+                    </div>
+                  </router-link>
 
-            <!--end::Item-->
-          </button>
-        </h2>
+                  <span class="text-muted d-block fw-bold">{{
+                    item.description
+                  }}</span>
+                </div>
+                <!--end::Text-->
+              </div>
+              <div class="text-gray-700 w-150px fs-6">
+                {{ item.symbol.split("BTC")[0] }}_BTC
+              </div>
+              <div class="text-gray-700 w-150px fs-6">{{ item.buyPrice }}</div>
+              <div class="text-gray-700 w-150px fs-6">
+                {{ item.profitPrice }}
+              </div>
+              <div class="text-gray-700 w-150px fs-6">
+                {{ item.stopLossPrice }}
+              </div>
+              <div class="text-gray-700 w-150px fs-6">
+                {{ moment(item.createTime).format("YYYY-MM-DD HH:mm:ss") }}
+              </div>
+              <div class="w-250px d-flex align-items-center">
+                <div class="progress">
+                  <div
+                    class="progress-bar bg-success"
+                    role="progressbar"
+                    :style="`width: ${item.status.profit}%`"
+                    :aria-valuenow="item.status.profit"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                  ></div>
+                  <div
+                    class="progress-bar bg-danger"
+                    role="progressbar"
+                    :style="`width: ${item.status.stopLoss}%`"
+                    :aria-valuenow="item.status.stopLoss"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                  ></div>
+                </div>
+                <p class="text-gray-700 fs-7 mb-0 ms-4">
+                  %{{
+                    (item.status.profit + item.status.stopLoss)
+                      .toFixed(2)
+                      .replace(/\.00$/, "")
+                  }}
+                </p>
+              </div>
+
+              <!--end::Item-->
+            </button>
+          </h2>
+        </div>
         <div
           :id="`kt_accordion_1_body_${item.id}`"
           class="accordion-collapse collapse"
@@ -225,10 +231,7 @@ export default defineComponent({
                   </span>
                   <span class="text-gray-700" v-else>
                     We encountered an error while processing your copy trade. We
-                    created a
-                    <a rel="noreferrer" target="_blank" href="#asdasd">
-                      help desk request
-                    </a>
+                    created a <strong>ticket below</strong>
                     to solve the problem together.
                   </span>
                   <span
@@ -236,9 +239,7 @@ export default defineComponent({
                     className="createDate text-gray-600"
                   >
                     {{
-                      moment(activity.createTime).format(
-                        "YYYY-MM-DD HH:mm:ss.SSS"
-                      )
+                      moment(activity.createTime).format("YYYY-MM-DD HH:mm:ss")
                     }}
                   </span>
                 </div>
@@ -246,6 +247,7 @@ export default defineComponent({
 
               <!--end::Item-->
             </div>
+            <ticket />
             <!--end::Timeline-->
           </div>
         </div>
