@@ -31,7 +31,7 @@
 
 <script>
 import { computed } from "vue";
-import { Mutations, Actions } from "@/store/enums/StoreEnums";
+import { Actions } from "@/store/enums/StoreEnums";
 
 export default {
   name: "Notif",

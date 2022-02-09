@@ -1,7 +1,8 @@
 <script>
-import { defineComponent, ref } from "vue";
-import ApiService from "@/core/services/ApiService";
+import { defineComponent, ref, computed } from "vue";
 import ticket from "@/components/widgets/ticket/ticket.vue";
+import { useRoute } from "vue-router";
+import { useStore } from "vuex";
 
 // import Dropdown2 from "@/components/dropdown/Dropdown2.vue";
 
@@ -17,7 +18,13 @@ export default defineComponent({
   },
   setup() {
     const cloudinaryName = ref(process.env.VUE_APP_CLOUDINARY_NAME);
-    const loading = ref(true);
+    const route = useRoute();
+    const store = useStore();
+
+    const isSelfProfile = computed(() => {
+      return store.getters.authenticatedUser.userName == route.params.userName;
+    });
+    // const loading = ref(true);
     const colors = {
       buyOrderPlaced: "text-primary",
       buyOrderPartiallyFilled: "text-success",
@@ -72,6 +79,7 @@ export default defineComponent({
     return {
       getActivityIconColorAndSizeObj,
       cloudinaryName,
+      isSelfProfile,
     };
   },
 });
@@ -229,11 +237,7 @@ export default defineComponent({
                     {{ activity.symbol.split("BTC")[0] }}
                     <strong>{{ activity.qty }}</strong>
                   </span>
-                  <span class="text-gray-700" v-else>
-                    We encountered an error while processing your copy trade. We
-                    created a <strong>ticket below</strong>
-                    to solve the problem together.
-                  </span>
+                  <span class="text-gray-700" v-else> An error ocurred. </span>
                   <span
                     v-if="!activity.helpDeskRequestUrl"
                     className="createDate text-gray-600"
@@ -247,7 +251,10 @@ export default defineComponent({
 
               <!--end::Item-->
             </div>
-            <ticket />
+            <ticket
+              :copy-trade-id="item.id"
+              v-if="item.errored && isSelfProfile"
+            />
             <!--end::Timeline-->
           </div>
         </div>

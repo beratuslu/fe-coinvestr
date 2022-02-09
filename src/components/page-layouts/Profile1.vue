@@ -217,14 +217,15 @@ export default {
                 start-100
                 mb-10
                 bg-success
-                rounded-circle
                 border border-4 border-white
+                rounded-circle
                 h-20px
                 w-20px
               "
             ></div>
 
             <a
+              v-if="isSelfProfile"
               @click.stop="openUploadWidget('profilePhoto')"
               style="right: -17px"
               class="

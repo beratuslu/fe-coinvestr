@@ -1,7 +1,96 @@
+<script>
+import { defineComponent, ref, computed } from "vue";
+import TicketDropdown from "@/components/dropdown/TicketDropdown.vue";
+import ApiService from "@/core/services/ApiService";
+import { ElMessage } from "element-plus";
+import { useStore } from "vuex";
+import { useRoute, useRouter } from "vue-router";
+
+export default defineComponent({
+  name: "ticket",
+  inject: ["moment"],
+  props: {
+    widgetClasses: String,
+    copyTradeId: Number,
+  },
+  components: {
+    // TicketDropdown,
+  },
+  setup(props) {
+    const loading = ref(false);
+    const ticket = ref({});
+    const store = useStore();
+    const route = useRoute();
+    const cloudinaryName = ref(process.env.VUE_APP_CLOUDINARY_NAME);
+
+    const authenticatedUser = computed(() => {
+      return store.getters.authenticatedUser;
+    });
+
+    const isSelfProfile = computed(() => {
+      return store.getters.authenticatedUser.userName == route.params.userName;
+    });
+
+    const getData = () => {
+      ApiService.get(`api/v1/copy-trade-tickets/${props.copyTradeId}`)
+        .then((response) => {
+          ticket.value = response.data[0];
+        })
+        .catch((err) => {
+          console.log(err);
+          ElMessage.error(err.message || "Server error");
+        })
+        .finally(() => {
+          loading.value = false;
+        });
+    };
+    const postComment = () => {
+      ApiService.post(`api/v1/copy-trade-tickets/post-comment`, {
+        ticketId: ticket.value.id,
+        copyTradeId: ticket.value.copyTradeId,
+        message: ticket.value.newComment,
+      })
+        .then((response) => {
+          ElMessage.success("Success!");
+          ticket.value.comments.push(response.data[0]);
+          ticket.value.status = "OPEN";
+          ticket.value.newComment = "";
+        })
+        .catch((err) => {
+          console.log(err);
+          ElMessage.error(err.message || "Server error");
+        });
+      // .finally(() => {});
+    };
+    const archiveTicket = () => {
+      ApiService.post(`api/v1/copy-trade-tickets/archive-ticket`, {
+        copyTradeId: ticket.value.copyTradeId,
+      })
+        .then((response) => {
+          ticket.value.status = response.data[0].status;
+          ElMessage.success("Success!");
+        })
+        .catch((err) => {
+          console.log(err);
+          ElMessage.error(err.message || "Server error");
+        });
+      // .finally(() => {});
+    };
+    getData();
+    return {
+      authenticatedUser,
+      ticket,
+      cloudinaryName,
+      isSelfProfile,
+      postComment,
+      archiveTicket,
+    };
+  },
+});
+</script>
+
 <template>
-  <!--begin::Feeds Widget 3-->
   <div class="card card-ticket mt-7" :class="widgetClasses">
-    <!--begin::Body-->
     <div
       class="
         card-body
@@ -15,28 +104,54 @@
         border-gray-300
       "
     >
-      <!--begin::Header-->
-      <div class="d-flex align-items-center mb-3">
-        <!--begin::User-->
-        <div class="d-flex align-items-center flex-grow-1">
-          <!--begin::Avatar-->
-          <div class="symbol symbol-45px me-5">
-            <img src="media/avatars/150-10.jpg" alt="" />
-          </div>
-          <!--end::Avatar-->
+      <div class="d-flex align-items-center mb-2">
+        <div class="flex-grow-1">
+          <!-- <span class="text-muted fw-bold fs-7">Status: </span> -->
+          <span class="badge fs-8 fw-bolder badge-light-primary" :class="{}">{{
+            ticket.status
+          }}</span>
 
-          <!--begin::Info-->
-          <div class="d-flex flex-column">
-            <a href="#" class="text-gray-800 text-hover-primary fs-6 fw-bolder"
-              >Carles Nilson</a
-            >
-            <span class="text-gray-400 fw-bold">Yestarday at 5:06 PM</span>
-          </div>
-          <!--end::Info-->
+          <span v-if="ticket.status == 'ARCHIVED'">
+            <el-tooltip>
+              <template #content>
+                <span>you can reopen it by adding a reply</span>
+              </template>
+
+              <span class="svg-icon svg-icon-2 svg-icon-primary me-4">
+                <inline-svg src="media/icons/duotune/general/gen045.svg" />
+              </span>
+            </el-tooltip>
+          </span>
         </div>
-        <!--end::User-->
 
-        <!--begin::Menu-->
+        <a
+          @click="archiveTicket"
+          class="btn btn-sm btn-light-success"
+          :class="{ disabled: ticket.status == 'ARCHIVED' }"
+        >
+          <span class="svg-icon svg-icon-3">
+            <inline-svg src="media/icons/duotune/arrows/arr012.svg" />
+          </span>
+          Close ticket
+        </a>
+      </div>
+      <div class="d-flex align-items-center mb-3">
+        <div class="d-flex align-items-center flex-grow-1">
+          <div class="symbol symbol-45px me-5">
+            <!-- <img src="media/avatars/150-10.jpg" alt="" /> -->
+            <img src="media/avatars/support3.png" alt="" />
+          </div>
+
+          <div class="d-flex flex-column">
+            <a class="text-gray-800 text-hover-primary fs-6 fw-bolder"
+              >Coinvestr Team</a
+            >
+            <span class="text-gray-400 fw-bold">{{
+              moment(ticket.createTime).format("YYYY-MM-DD HH:mm:ss")
+            }}</span>
+          </div>
+        </div>
+
         <div class="my-0">
           <!-- <button
             type="button"
@@ -53,7 +168,7 @@
           </button>
           <Dropdown2></Dropdown2> -->
 
-          <el-popover
+          <!-- <el-popover
             popper-class="px-0 py-0"
             placement="bottom"
             :width="202"
@@ -72,25 +187,17 @@
               </button>
             </template>
 
-            <TicketDropdown v-if="true" />
-          </el-popover>
+            <TicketDropdown />
+          </el-popover> -->
         </div>
-        <!--end::Menu-->
       </div>
-      <!--end::Header-->
 
-      <!--begin::Post-->
       <div class="mb-7">
-        <!--begin::Text-->
         <div class="text-gray-800 mb-5">
-          Outlines keep you honest. They stop you from indulging in poorly
-          thought-out metaphors about driving and keep you focused on the
-          overall structure of your post
+          {{ ticket.subject }}
         </div>
-        <!--end::Text-->
 
-        <!--begin::Toolbar-->
-        <div class="d-flex align-items-center mb-5">
+        <!-- <div class="d-flex align-items-center mb-5">
           <a
             href="#"
             class="
@@ -119,106 +226,100 @@
             </span>
             150
           </a>
-        </div>
-        <!--end::Toolbar-->
+        </div> -->
       </div>
-      <!--end::Post-->
 
-      <!--begin::Replies-->
-      <div class="mb-7 ps-10">
-        <!--begin::Reply-->
-        <div class="d-flex mb-5">
-          <!--begin::Avatar-->
+      <div class="mb-7 ps-101">
+        <div
+          v-for="comment in ticket.comments"
+          :key="comment.id"
+          class="d-flex mb-5"
+        >
           <div class="symbol symbol-45px me-5">
-            <img src="media/avatars/150-11.jpg" alt="" />
-          </div>
-          <!--end::Avatar-->
+            <router-link
+              v-if="comment.userId !== 0"
+              :to="`/profile/${authenticatedUser.userName}/overview`"
+              class="text-dark fw-bolder text-hover-primary fs-6"
+            >
+              <div class="me-21 symbol symbol-45px">
+                <img
+                  :src="
+                    authenticatedUser.profilePhoto
+                      ? `https://res.cloudinary.com/${cloudinaryName}/image/upload/w_300,h_300,c_fill,g_custom/${authenticatedUser.profilePhoto}.jpg`
+                      : `media/avatars/blank.png`
+                  "
+                  alt=""
+                />
+              </div>
+            </router-link>
 
-          <!--begin::Info-->
+            <img v-else src="media/avatars/support3.png" alt="" />
+          </div>
+
           <div class="d-flex flex-column flex-row-fluid">
-            <!--begin::Info-->
             <div class="d-flex align-items-center flex-wrap mb-1">
+              <router-link
+                v-if="comment.userId !== 0"
+                :to="`/profile/${authenticatedUser.userName}/overview`"
+                ƒ
+                class="text-gray-700 fw-bolder text-hover-primary fs-6 me-2"
+              >
+                <div class="">
+                  {{
+                    `${authenticatedUser.name} ${authenticatedUser.lastName}`
+                  }}
+                </div>
+              </router-link>
+
               <a
-                href="#"
+                v-else
+                disabled
                 class="text-gray-800 text-hover-primary fw-bolder me-2"
-                >Alice Danchik</a
+                >Coinvestr Team</a
               >
 
-              <span class="text-gray-400 fw-bold fs-7">1 day</span>
-
-              <a
-                href="#"
-                class="ms-auto text-gray-400 text-hover-primary fw-bold fs-7"
-                >Reply</a
-              >
+              <span class="text-gray-400 fw-bold">{{
+                moment(comment.createTime).format("YYYY-MM-DD HH:mm:ss")
+              }}</span>
             </div>
-            <!--end::Info-->
 
-            <!--begin::Post-->
             <span class="text-gray-800 fs-7 fw-normal pt-1">
-              Long before you sit dow to put digital pen to paper you need to
-              make sure you have to sit down and write.
+              {{ comment.message }}
             </span>
-            <!--end::Post-->
           </div>
-          <!--end::Info-->
         </div>
-        <!--end::Reply-->
-
-        <!--begin::Reply-->
-        <div class="d-flex">
-          <!--begin::Avatar-->
-          <div class="symbol symbol-45px me-5">
-            <img src="media/avatars/150-8.jpg" alt="" />
-          </div>
-          <!--end::Avatar-->
-
-          <!--begin::Info-->
-          <div class="d-flex flex-column flex-row-fluid">
-            <!--begin::Info-->
-            <div class="d-flex align-items-center flex-wrap mb-1">
-              <a
-                href="#"
-                class="text-gray-800 text-hover-primary fw-bolder me-2"
-                >Harris Bold</a
-              >
-
-              <span class="text-gray-400 fw-bold fs-7">2 days</span>
-
-              <a
-                href="#"
-                class="ms-auto text-gray-400 text-hover-primary fw-bold fs-7"
-                >Reply</a
-              >
-            </div>
-            <!--end::Info-->
-
-            <!--begin::Post-->
-            <span class="text-gray-800 fs-7 fw-normal pt-1">
-              Outlines keep you honest. They stop you from indulging in poorly
-            </span>
-            <!--end::Post-->
-          </div>
-          <!--end::Info-->
-        </div>
-        <!--end::Reply-->
       </div>
-      <!--end::Replies-->
 
-      <!--begin::Separator-->
       <div class="separator mb-4"></div>
-      <!--end::Separator-->
 
-      <!--begin::Reply input-->
-      <form class="position-relative mb-6">
+      <form class="position-relative mb-6 d-flex">
         <textarea
-          class="form-control border-0 p-0 pe-10 resize-none min-h-25px"
+          v-model="ticket.newComment"
+          class="
+            form-control
+            border-01
+            pe-10
+            resize-none
+            min-h-40px
+            form-control-solid
+            px-3
+          "
           data-kt-autosize="true"
           rows="1"
           placeholder="Reply.."
         ></textarea>
 
-        <div class="position-absolute top-0 end-0 me-n5">
+        <div class="position-absolute1 top-0 end-0 me-n5">
+          <!-- @click="addNewMessage" -->
+          <button
+            @click="postComment"
+            class="btn btn-primary"
+            type="button"
+            data-kt-element="send"
+          >
+            Send
+          </button>
+          <!-- 
           <span class="btn btn-icon btn-sm btn-active-color-primary pe-0 me-2">
             <span class="svg-icon svg-icon-3 mb-3">
               <inline-svg src="media/icons/duotune/communication/com008.svg" />
@@ -229,33 +330,13 @@
             <span class="svg-icon svg-icon-2 mb-3">
               <inline-svg src="media/icons/duotune/general/gen018.svg" />
             </span>
-          </span>
+          </span> -->
         </div>
       </form>
-      <!--edit::Reply input-->
     </div>
-    <!--end::Body-->
   </div>
-  <!--end::Feeds Widget 3-->
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-import TicketDropdown from "@/components/dropdown/TicketDropdown.vue";
-
-export default defineComponent({
-  name: "widget-3",
-  props: {
-    widgetClasses: String,
-  },
-  components: {
-    TicketDropdown,
-  },
-  setup() {
-    console.log("ticket");
-  },
-});
-</script>
 <style lang="scss" scoped>
 .card-ticket {
   .card-body {
