@@ -41,10 +41,9 @@ export default defineComponent({
     const parseData = (data) => {
       trades.value = data.map((trade) => {
         const tradeToReturn = trade;
-        const { helpDeskRequestUrl } = trade;
         if (trade.errored) {
           tradeToReturn.activities.push({
-            helpDeskRequestUrl,
+            errored: true,
             type: "error",
           });
         }

@@ -16,7 +16,7 @@ export default defineComponent({
     KTUserMenu,
     // KTSearch,
     NotificationsMenu1,
-    NotificationList,
+    // NotificationList,
   },
   setup() {
     const cloudinaryName = ref(process.env.VUE_APP_CLOUDINARY_NAME);
@@ -137,7 +137,8 @@ export default defineComponent({
       <!-- <el-button>Click to activate</el-button> -->
       <!-- content="this is content, this is content, this is content" -->
       <!-- title="Title" -->
-      <el-popover placement="bottom" :width="400" trigger="click">
+
+      <!-- <el-popover placement="bottom" :width="400" trigger="click">
         <template #reference>
           <div class="d-flex align-items-center ms-1 ms-lg-3">
             <div
@@ -158,7 +159,7 @@ export default defineComponent({
         </template>
 
         <NotificationList v-if="true" />
-      </el-popover>
+      </el-popover> -->
 
       <div class="d-flex align-items-stretch ms-1 ms-lg-3">
         <NotificationsMenu1 />

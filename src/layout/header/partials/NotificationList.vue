@@ -19,6 +19,9 @@ import COPY_TRADE_FAILED_DUE_TO_INVALID_BUY_ORDER from "@/layout/header/partials
 import COPY_TRADE_ACTIVITY_PROFIT_SELL_ORDER_PLACED from "@/layout/header/partials/NotifMessages/CopyTradeActivityProfitSellOrderPlaced.vue";
 import COPY_TRADE_ERRORED from "@/layout/header/partials/NotifMessages/CopyTradeErrored.vue";
 
+import COPY_TRADE_TICKET_COMMENTED from "@/layout/header/partials/NotifMessages/CopyTradeTicketCommented.vue";
+import COPY_TRADE_TICKET_ARCHIVED from "@/layout/header/partials/NotifMessages/CopyTradeTicketArchived.vue";
+
 import ApiService from "@/core/services/ApiService";
 import { ElNotification } from "element-plus";
 import { useStore } from "vuex";
@@ -32,6 +35,9 @@ export default {
     Main,
     Empty,
     MenuComponent,
+
+    COPY_TRADE_TICKET_COMMENTED,
+    COPY_TRADE_TICKET_ARCHIVED,
     INSUFFICIENT_BALANCE_FOR_SOCKET_CHECK,
     COPY_TRADE_START,
     COPY_TRADE_FAILED_DUE_TO_INSUFFICIENT_BALANCE,

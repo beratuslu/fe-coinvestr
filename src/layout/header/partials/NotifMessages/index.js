@@ -12,6 +12,8 @@ import CopyTradeCompleted from "./CopyTradeCompleted.vue";
 import CopyTradeFailedDueToInvalidBuyOrder from "./CopyTradeFailedDueToInvalidBuyOrder.vue";
 import CopyTradeActivityProfitSellOrderPlaced from "./CopyTradeActivityProfitSellOrderPlaced.vue";
 import CopyTradeErrored from "./CopyTradeErrored.vue";
+import CopyTradeTicketCommented from "./CopyTradeTicketCommented.vue";
+import CopyTradeTicketArchived from "./CopyTradeTicketArchived.vue";
 
 export default {
   INSUFFICIENT_BALANCE_FOR_SOCKET_CHECK: InsufficientBalanceForSocketCheck,
@@ -36,4 +38,6 @@ export default {
   COPY_TRADE_ACTIVITY_PROFIT_SELL_ORDER_PLACED:
     CopyTradeActivityProfitSellOrderPlaced,
   COPY_TRADE_ERRORED: CopyTradeErrored,
+  COPY_TRADE_TICKET_COMMENTED: CopyTradeTicketCommented,
+  COPY_TRADE_TICKET_ARCHIVED: CopyTradeTicketArchived,
 };

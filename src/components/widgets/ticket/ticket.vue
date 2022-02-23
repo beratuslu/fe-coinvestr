@@ -237,7 +237,7 @@ export default defineComponent({
         >
           <div class="symbol symbol-45px me-5">
             <router-link
-              v-if="comment.userId !== 0"
+              v-if="comment.userId > 0"
               :to="`/profile/${authenticatedUser.userName}/overview`"
               class="text-dark fw-bolder text-hover-primary fs-6"
             >
@@ -259,7 +259,7 @@ export default defineComponent({
           <div class="d-flex flex-column flex-row-fluid">
             <div class="d-flex align-items-center flex-wrap mb-1">
               <router-link
-                v-if="comment.userId !== 0"
+                v-if="comment.userId > 0"
                 :to="`/profile/${authenticatedUser.userName}/overview`"
                 ƒ
                 class="text-gray-700 fw-bolder text-hover-primary fs-6 me-2"
@@ -293,7 +293,9 @@ export default defineComponent({
       <div class="separator mb-4"></div>
 
       <form class="position-relative mb-6 d-flex">
-        <textarea
+        <input
+          @keypress.enter.prevent
+          type="text"
           v-model="ticket.newComment"
           class="
             form-control
@@ -307,7 +309,7 @@ export default defineComponent({
           data-kt-autosize="true"
           rows="1"
           placeholder="Reply.."
-        ></textarea>
+        />
 
         <div class="position-absolute1 top-0 end-0 me-n5">
           <!-- @click="addNewMessage" -->

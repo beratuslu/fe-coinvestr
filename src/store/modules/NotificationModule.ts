@@ -148,6 +148,7 @@ export default class BodyModule
   }
   @Mutation
   [Mutations.ADD_NOTIFICATION](notif) {
+    console.log("🚀 ~ file: NotificationModule.ts ~ line 151 ~ notif", notif);
     this.notifications.unshift(notif);
   }
   @Mutation

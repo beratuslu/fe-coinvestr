@@ -68,7 +68,7 @@ export default defineComponent({
         obj["fa-times-circle"] = true;
         obj["fa-genderless"] = false;
       }
-      if (activity.helpDeskRequestUrl) {
+      if (activity.errored) {
         obj["fa-exclamation"] = true;
         obj["fa-genderless"] = false;
       }
@@ -94,7 +94,7 @@ export default defineComponent({
       <div class="accordion-item" v-for="(item, index) in list" :key="item.id">
         <div class="overflow-auto">
           <h2
-            style="min-width: 1200px"
+            style="min-width: 1190px"
             class="accordion-header d-flex"
             :id="`kt_accordion_1_header_${item.id}`"
           >
@@ -225,13 +225,13 @@ export default defineComponent({
 
                 <div class="fw-normal timeline-content text-muted ps-3">
                   <span
-                    v-if="!activity.helpDeskRequestUrl"
+                    v-if="!activity.errored"
                     className="activity text-gray-700 fw-bolder"
                   >
                     {{ activity.title }}
                   </span>
                   <span
-                    v-if="!activity.helpDeskRequestUrl"
+                    v-if="!activity.errored"
                     className="amountSymbol text-primary"
                   >
                     {{ activity.symbol.split("BTC")[0] }}
@@ -239,7 +239,7 @@ export default defineComponent({
                   </span>
                   <span class="text-gray-700" v-else> An error ocurred. </span>
                   <span
-                    v-if="!activity.helpDeskRequestUrl"
+                    v-if="!activity.errored"
                     className="createDate text-gray-600"
                   >
                     {{
