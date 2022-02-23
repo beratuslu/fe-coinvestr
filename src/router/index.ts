@@ -5,7 +5,8 @@ import { Mutations } from "@/store/enums/StoreEnums";
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    redirect: "/dashboard",
+    // redirect: "/all-users",
+    redirect: "/profile/beratuslu",
     component: () => import("@/layout/Layout.vue"),
     children: [
       {
