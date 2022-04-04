@@ -162,6 +162,15 @@ export default defineComponent({
           @invalid-submit="onInvalidSubmit"
         >
           <div class="modal-body py-10 px-lg-17">
+            <div>
+              <a
+                class="buy-with-crypto"
+                href="https://commerce.coinbase.com/checkout/a549cc56-2541-4588-adee-d8f95efd5f75"
+              >
+                Buy with Crypto
+              </a>
+            </div>
+
             <div
               class="scroll-y me-n7 pe-7"
               id="kt_modal_add_customer_scroll"
