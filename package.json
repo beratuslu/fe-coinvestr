@@ -9,6 +9,7 @@
     "rtl": "webpack --config webpack-rtl.config.js"
   },
   "dependencies": {
+    "@chenfengyuan/vue-countdown": "2",
     "@fortawesome/fontawesome-free": "^5.15.4",
     "@fullcalendar/core": "^5.9.0",
     "@fullcalendar/daygrid": "^5.9.0",
@@ -45,7 +46,7 @@
     "socicon": "^3.0.5",
     "sweetalert2": "^9.10.12",
     "vee-validate": "^4.5.2",
-    "vue": "^3.2.19",
+    "vue": "3",
     "vue-axios": "^3.3.7",
     "vue-currency-input": "^2.1.0",
     "vue-final-modal": "^3.4.3",

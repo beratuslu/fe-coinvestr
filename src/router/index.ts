@@ -313,17 +313,72 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/crafted/authentication/basic-flow/SignIn.vue"),
       },
-      {
-        path: "/sign-up",
-        name: "sign-up",
-        component: () =>
-          import("@/views/crafted/authentication/basic-flow/SignUp.vue"),
-      },
+
+      // {
+      //   path: "register/basic-info",
+      //   name: "RegisterBasicInfo",
+      //   component: () => import("@/views/crafted/pages/register/BasicInfo.vue"),
+      // },
+      // {
+      //   path: "/register/email-verification",
+      //   name: "RegisterEmailVerification",
+      //   component: () =>
+      //     import("@/views/crafted/pages/register/EmailVerification.vue"),
+      // },
+      // {
+      //   path: "/register/user-name-selection",
+      //   name: "RegisterUserNameSelection",
+      //   component: () =>
+      //     import("@/views/crafted/pages/register/UserNameSelection.vue"),
+      // },
+      // {
+      //   path: "register/binance-connection",
+      //   name: "RegisterBinanceConnection",
+      //   component: () =>
+      //     import("@/views/crafted/pages/register/BinanceConnection.vue"),
+      // },
+
+      // {
+      //   path: "/sign-up",
+      //   name: "sign-up",
+      //   component: () =>
+      //     import("@/views/crafted/authentication/basic-flow/SignUp.vue"),
+      // },
       {
         path: "/password-reset",
         name: "password-reset",
         component: () =>
           import("@/views/crafted/authentication/basic-flow/PasswordReset.vue"),
+      },
+    ],
+  },
+  {
+    path: "/sign-up",
+    component: () => import("@/components/page-layouts/Auth.vue"),
+    redirect: { name: "RegisterBasicInfo" },
+    children: [
+      {
+        path: "basic-info",
+        name: "RegisterBasicInfo",
+        component: () => import("@/views/crafted/pages/register/BasicInfo.vue"),
+      },
+      {
+        path: "email-verification",
+        name: "RegisterEmailVerification",
+        component: () =>
+          import("@/views/crafted/pages/register/EmailVerification.vue"),
+      },
+      {
+        path: "user-name-selection",
+        name: "RegisterUserNameSelection",
+        component: () =>
+          import("@/views/crafted/pages/register/UserNameSelection.vue"),
+      },
+      {
+        path: "binance-connection",
+        name: "RegisterBinanceConnection",
+        component: () =>
+          import("@/views/crafted/pages/register/BinanceConnection.vue"),
       },
     ],
   },
