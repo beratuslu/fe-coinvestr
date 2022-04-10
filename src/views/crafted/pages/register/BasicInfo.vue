@@ -268,7 +268,7 @@ export default defineComponent({
                   <router-link to="/sign-in" class="link-primary fw-bolder">
                     sign in
                   </router-link>
-                  and complete registration.
+                  .
                 </span>
               </span>
             </div>
