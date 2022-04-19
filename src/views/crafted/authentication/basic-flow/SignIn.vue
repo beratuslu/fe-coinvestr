@@ -175,7 +175,7 @@ export default defineComponent({
           //   // Go to page after successfully login
           //   router.push({ name: "dashboard" });
           // });
-          router.push({ name: "dashboard" });
+          router.push({ name: "allUsers" });
         })
         .catch(() => {
           const [error] = Object.keys(store.getters.getErrors);

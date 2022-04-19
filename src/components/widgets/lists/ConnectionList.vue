@@ -74,16 +74,7 @@ export default defineComponent({
                 />
               </div>
             </router-link>
-            <!--end::Avatar-->
-
-            <!--begin::Text-->
             <div class="flex-grow-1">
-              <!-- <a
-              @click="$router.push(`/profile/${item.userName}/overview`)"
-              class="text-dark fw-bolder text-hover-primary fs-6"
-              >{{ item.name }}</a
-            > -->
-
               <router-link
                 :to="`/profile/${item.userName}/overview`"
                 class="text-gray-700 fw-bolder text-hover-primary fs-6"
