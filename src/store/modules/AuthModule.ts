@@ -91,14 +91,10 @@ export default class AuthModule extends VuexModule implements UserAuthInfo {
     ApiService.removeHeader();
     // const router = useRouter();
     router.push({ name: "sign-in" });
-    setTimeout(() => {
-      // window.location.href = "#/sign-in";
-      console.log(
-        "🚀 ~ file: AuthModule.ts ~ line 90 ~ AuthModule ~ setTimeout ~ window.location.href",
-        window.location.href
-      );
-      window.location.reload();
-    }, 200);
+    // setTimeout(() => {
+    //   // window.location.href = "#/sign-in";
+    //   window.location.reload();
+    // }, 200);
 
     // ApiService.vueInstance.$router.push({ name: "sign-in" });
     // App.$router.push({ name: "sign-in" });
