@@ -54,10 +54,16 @@ export default defineComponent({
 
         ApiService.post(`/auth/register`, requestObj)
           .then((response) => {
-            ElMessage.success(response.message || "Success!");
+            // ElMessage.success(response.message || "Success!");
+            ElMessage({
+              showClose: true,
+              message: response.message || "Success!",
+              type: "success",
+              duration: 10000,
+            });
             setTimeout(() => {
               window.location.href = "/";
-            }, 5000);
+            }, 10000);
           })
           .catch((err) => {
             ElMessage.error(err.message || "Server error");
